@@ -3,24 +3,19 @@ package com.example.todolistapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.todolistapp.ui.theme.Shapes
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 
 class HomeScreen : ComponentActivity() {
@@ -42,6 +37,7 @@ fun LoadNotes() {
             .fillMaxSize()
     ) {
         Column() {
+            //AddNote()
             ListNotes(
                 notesList = listOf(
                     "Drink water",
@@ -53,6 +49,7 @@ fun LoadNotes() {
         }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -69,9 +66,7 @@ fun ListNotes(
                     .fillMaxSize()
                     .background(Color.White)
                     .clip(RoundedCornerShape(10.dp))
-                    .padding(15.dp)
-
-                    //.animateItemPlacement(animationSpec = tween(10000000))
+                    .padding(15.dp),
             ) {
                 Text(text = notesList[it], color = Color.Black)
             }
@@ -80,4 +75,43 @@ fun ListNotes(
 }
 
 
+
+@Composable
+fun AddNote(){
+    val openDialog = remember { mutableStateOf(true) }
+    var text by remember { mutableStateOf("") }
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Add Note Description")
+            },
+            text = {
+                Column() {
+                    TextField(
+                        value = text,
+                        onValueChange = { text = it }
+                    )
+                    Text("Note description")
+                }
+            },
+            buttons = {
+                Row(
+                    modifier = Modifier.padding(all = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { openDialog.value = false }
+                    ) {
+                        Text("Add Note To The List")
+                    }
+                }
+            }
+        )
+    }
+}
 
