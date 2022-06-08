@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -42,29 +44,20 @@ fun LoadNotes() {
             .background(Color.LightGray)
             .fillMaxSize()
     ) {
-        Column() {
-            //AddNote()
+        Column {
             AddNotes()
-            /*  ListNotes(
-                  notesList = listOf(
-                      "Drink water",
-                      "Read Books",
-                      "Eat fruits",
-                      "Go for a Walk"
-                  )
-              )*/
         }
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListNotes(
+fun AddNotesToList(
     notesList: List<String>
 ) {
-    LazyColumn(
-    ) {
+    Log.d("TAG", notesList.toString())
+    var noteListState = remember { mutableStateOf(listOf<String>()) }
+    LazyColumn {
         items(notesList.size) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -81,7 +74,6 @@ fun ListNotes(
             ) {
                 Text(
                     text = notesList[it], color = Color.Black,
-
                     modifier = Modifier
                         .align(
                             Alignment.BottomCenter
@@ -98,9 +90,10 @@ fun ListNotes(
 
 //Custom dialog box func
 @Composable
-fun AddNote() {
+fun AddNewNote() {
     val openDialog = remember { mutableStateOf(true) }
     var text by remember { mutableStateOf("") }
+    // var addNoteBtnState by remember { mutableStateOf(true) }
 
     if (openDialog.value) {
         AlertDialog(
@@ -111,7 +104,7 @@ fun AddNote() {
                 Text(text = "Add Note Description")
             },
             text = {
-                Column() {
+                Column {
                     TextField(
                         value = text,
                         onValueChange = { text = it }
@@ -124,16 +117,25 @@ fun AddNote() {
                     modifier = Modifier.padding(all = 8.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        //Will have to add the add to list functionality here
-                        onClick = {
-                            Log.d("Note Text", text)
-                            openDialog.value = false
-                        }
-                    ) {
-                        Text("Add Note To The List")
+                    var addNoteButtonState by remember { mutableStateOf(false) }
+                    if (addNoteButtonState) {
+                        AddNewNote(noteDescription = text)
+                    } else {
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                //Will have to add the add to list functionality here
+                                onClick = {
+                                    addNoteButtonState = true
+                                    Log.d("Note Text", text)
+                                    // addNoteBtnState=true
+                                    openDialog.value = false
+                                }
+                            ) {
+                                Text("Add Note To The List")
 
+                            }
+                        }
                     }
                 }
             }
@@ -141,50 +143,67 @@ fun AddNote() {
     }
 }
 
+@Composable
+fun AddNewNote(noteDescription: String) {
+    Log.d("noteDescription", noteDescription)
+    AddNotesToList(
+        notesList = listOf(
+            noteDescription
+        )
+    )
+}
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AddNotes() {
-    //  val buttonState = remember { mutableStateOf(true) }
+    AnimatedVisibility(
+        visible = true,
+        enter = fadeIn() ,
+        exit = shrinkOut(shrinkTowards = Alignment.BottomStart, animationSpec = tween(1000))
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(10.dp)
-            .shadow(2.dp)
     ) {
+    Column(
+            Modifier
+                .fillMaxSize()
+                .padding(10.dp)
+                .shadow(2.dp)
+        ) {
 
 
-        Row(Modifier.padding(16.dp))
-        {
-            var buttonState by remember { mutableStateOf(false) }
+            Row(Modifier.padding(16.dp))
+            {
+                var buttonState by remember { mutableStateOf(false) }
 
-            if (buttonState) {
-                AddNote()
-            } else {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    //Will have to add the add to list functionality here
-                    onClick = {
-                        buttonState = true
-                        /*AddNote()*/
+                if (buttonState) {
+                    //buttonState=false
+                    AddNewNote()
+                } else {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        //Will have to add the add to list functionality here
+                        onClick = {
+                            buttonState = true
+                            /*AddNote()*/
+                        }
+
+                    ) {
+
+                        Text("Add New Note")
                     }
-                ) {
-
-                    Text("Add New Note")
                 }
+
             }
+            AddNotesToList(
+                notesList = listOf(
+                    "Drink water",
+                    "Read Books",
+                    "Eat fruits",
+                    "Go for a Walk"
+                )
 
-        }
-        ListNotes(
-            notesList = listOf(
-                "Drink water",
-                "Read Books",
-                "Eat fruits",
-                "Go for a Walk"
+
             )
-
-
-        )
+        }
     }
 }
