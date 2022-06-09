@@ -27,10 +27,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.todolistapp.ui.ToDoListHomeScreen
+
+import com.example.todolistapp.ui.ListPreviousNotes
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 
- var newList = ArrayList<String>()
+
 class HomeScreen : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +40,8 @@ class HomeScreen : ComponentActivity() {
         setContent {
             ToDoListAPPTheme {
             //    LoadNotes()
-                ToDoListHomeScreen()
+             //   ToDoListHomeScreen()
+                ListPreviousNotes()
             }
         }
     }
@@ -62,8 +64,6 @@ fun LoadNotes() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddNotesToList(lazyListState: List<String>) {
-
-
     val listState = rememberScrollState()
     LazyColumn() {
         items(lazyListState.size) {
