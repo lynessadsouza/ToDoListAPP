@@ -9,10 +9,12 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.shrinkOut
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -25,15 +27,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.todolistapp.ui.ToDoListHomeScreen
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 
-
+ var newList = ArrayList<String>()
 class HomeScreen : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                LoadNotes()
+            //    LoadNotes()
+                ToDoListHomeScreen()
             }
         }
     }
@@ -42,6 +48,7 @@ class HomeScreen : ComponentActivity() {
 @Composable
 fun LoadNotes() {
     Box(
+
         modifier = Modifier
             .background(Color.LightGray)
             .fillMaxSize()
@@ -54,11 +61,12 @@ fun LoadNotes() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AddNotesToList(notesList: List<String>) {
+fun AddNotesToList(lazyListState: List<String>) {
+
+
     val listState = rememberScrollState()
-    Log.d("TAG", notesList.toString())
     LazyColumn() {
-        items(notesList.size) {
+        items(lazyListState.size) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -68,10 +76,10 @@ fun AddNotesToList(notesList: List<String>) {
                     .background(Color.White)
                     .clip(RoundedCornerShape(10.dp))
                     .padding(15.dp)
-                    .animateItemPlacement(animationSpec = tween(1000))
+                    .animateItemPlacement(animationSpec = tween(1000)),
             ) {
                 Text(
-                    text = notesList[it], color = Color.Black,
+                    text = lazyListState[it], color = Color.Black,
                     modifier = Modifier
                         .align(
                             Alignment.BottomCenter
@@ -136,12 +144,13 @@ fun AddNewNote() {
 
 @Composable
 fun AddNewNote(noteDescription: String) {
-    Log.d("noteDescription", noteDescription)
-    AddNotesToList(
-        notesList = listOf(
-            noteDescription
-        )
-    )
+  /*  Log.d("noteDescription", noteDescription)
+    AddNotesToList(lazyListState = listOf(noteDescription))*/
+    val note="heyyhloo"
+    val lazyListStatee by remember { mutableStateOf(listOf(note)) }
+    AddNotesToList(lazyListState = lazyListStatee)
+
+
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -162,6 +171,9 @@ fun AddNotes() {
             {
                 var buttonState by remember { mutableStateOf(false) }
                 if (buttonState) {
+                    val note="heyy"
+                    val lazyListStatee by remember { mutableStateOf(listOf(note)) }
+                    AddNotesToList(lazyListState = lazyListStatee)
                     AddNewNote()
                 } else {
                     Button(
@@ -174,24 +186,17 @@ fun AddNotes() {
                     }
                 }
             }
-            AddNotesToList(
-                notesList = listOf(
-                    "Drink water",
-                    "Read Books",
-                    "Eat fruits",
-                    "Go for a Walk",
-                    "Drink water",
-                    "Read Books",
-                    "Eat fruits",
-                    "Go for a Walk",
-                    "Go for a Walk",
-                    "Drink water",
-                    "Read Books",
-                    "Eat fruits",
-                    "Go for a Walk"
+            val lazyListState by remember { mutableStateOf(listOf("Drink water", "Walk")) }
+            AddNotesToList(lazyListState = lazyListState)
+            val note="Run"
+            val lazyListStatee by remember { mutableStateOf(listOf(note)) }
+            AddNotesToList(lazyListState = lazyListStatee)
 
-                )
-            )
         }
     }
+}
+
+fun addtoList(lazyListState: List<String>)
+{
+
 }
