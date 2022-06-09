@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,10 +31,10 @@ fun NewNoteInput(
 ) {
     var textState by remember { mutableStateOf("hey") }
     //  TextField(value = textState, onValueChange = { textState = it })
-    /* TextField(
+     TextField(
          value = textState,
          onValueChange = { textState = it }
-     )*/
+     )
 
     Column() {
         Button(
