@@ -27,11 +27,15 @@ fun ListPreviousNotes() {
             .fillMaxSize()
             .padding(5.dp)
             .shadow(1.dp)
+
     ) {
         var noteListState by remember { mutableStateOf(listOf("Drink water", "Walk")) }
-        Row(Modifier.padding(10.dp)) {
+        Row(
+            Modifier
+                .padding(5.dp)
+                .align(alignment = Alignment.CenterHorizontally)) {
             Checkbox(checked, onCheckedChange)
-            Text("Add Note ")
+            Text("Add Note ", modifier = Modifier.padding(top=12.dp))
         }
         AnimatedVisibility(
             visible = checked,
@@ -80,14 +84,10 @@ fun DisplayNotesList(notes: List<String>) {
                             exit = slideOutVertically()
                         )
                 ) {
-                    Text(
-                        modifier = Modifier
-                            .align(
-                                Alignment.BottomCenter
-                            ),
-                        text = notes[index], color = Color.Black
+                        Text(
+                            text = notes[index], color = Color.Black
+                        )
 
-                    )
                 }
 
 
@@ -95,37 +95,6 @@ fun DisplayNotesList(notes: List<String>) {
         }
     }
 
-
-    /*   LazyColumn() {
-           items(notes.size) { index ->
-               Box(
-                   contentAlignment = Alignment.Center,
-                   modifier = Modifier
-                       .padding(start = 15.dp, top = 15.dp, bottom = 1.dp, end = 15.dp)
-                       .fillMaxSize()
-                       .background(Color.Gray)
-                       .padding(15.dp)
-                       .horizontalScroll(listState)
-               ) {
-                   Text(
-                       modifier = Modifier
-                           .align(
-                               Alignment.BottomCenter
-                           )
-                           .animateItemPlacement(
-                               animationSpec = tween(
-                                   durationMillis = 1000,
-                                   easing = LinearOutSlowInEasing,
-                               )
-                           ),
-                       text = notes[index], color = Color.Black
-
-                   )
-               }
-
-
-           }
-       }*/
 }
 
 
