@@ -3,12 +3,9 @@ package com.example.todolistapp.ui
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +14,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+@ExperimentalMaterialApi
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ListPreviousNotes() {
@@ -33,9 +31,10 @@ fun ListPreviousNotes() {
         Row(
             Modifier
                 .padding(5.dp)
-                .align(alignment = Alignment.CenterHorizontally)) {
+                .align(alignment = Alignment.CenterHorizontally)
+        ) {
             Checkbox(checked, onCheckedChange)
-            Text("Add Note ", modifier = Modifier.padding(top=12.dp))
+            Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
         }
         AnimatedVisibility(
             visible = checked,
@@ -52,28 +51,32 @@ fun ListPreviousNotes() {
 }
 
 
+@ExperimentalMaterialApi
 @ExperimentalAnimationApi
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisplayNotesList(notes: List<String>) {
     val listState = rememberScrollState()
     val (visible) = remember { mutableStateOf(true) }
-
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
 
-        LazyColumn() {
+        LazyColumn(
+        ) {
+
             items(notes.size) { index ->
-                Box(
-                    contentAlignment = Alignment.Center,
+                Row(
+                    //     modifier = Modifier.background(Color.Blue)
                     modifier = Modifier
                         .padding(start = 15.dp, top = 15.dp, bottom = 1.dp, end = 15.dp)
                         .fillMaxSize()
                         .background(Color.Gray)
                         .padding(15.dp)
+                        .clickable {
+                        }
                         .horizontalScroll(listState)
                         .animateEnterExit(
                             // Slide in/out the inner box.
@@ -82,11 +85,23 @@ fun DisplayNotesList(notes: List<String>) {
                                 animationSpec = tween(1000)
                             ),
                             exit = slideOutVertically()
-                        )
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+
                 ) {
-                        Text(
-                            text = notes[index], color = Color.Black
-                        )
+                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                    Text(
+                        text = notes[index],
+                        color = if (checked) {
+                            Color.Red
+                        } else {
+                            Color.Black
+                        }
+                    )
+                    Checkbox(checked, onCheckedChange)
+                    //Text("Done")
+
 
                 }
 
