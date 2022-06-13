@@ -1,8 +1,9 @@
 package com.example.todolistapp.ui
 
 
+import android.util.Log
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,11 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import com.example.todolistapp.HomeScreenHeader
 
 @ExperimentalMaterialApi
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
+
 fun ListPreviousNotes() {
     val (checked, onCheckedChange) = remember { mutableStateOf(false) }
     Column(
@@ -27,7 +31,16 @@ fun ListPreviousNotes() {
             .shadow(1.dp)
 
     ) {
-        var noteListState by remember { mutableStateOf(listOf("Drink water", "Walk")) }
+        HomeScreenHeader()
+        var noteListState by remember { mutableStateOf(listOf("Drink water", "Walk", "run","running " )) }
+        var filteredList by remember { mutableStateOf(listOf("")) }
+
+        if(filteredList!="")
+        Log.d("noteListState","$noteListState")
+        Log.d("filteredList","$filteredList")
+
+
+
         Row(
             Modifier
                 .padding(5.dp)
@@ -35,6 +48,28 @@ fun ListPreviousNotes() {
         ) {
             Checkbox(checked, onCheckedChange)
             Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
+            SearchNote{
+                item->
+                Log.d("TAG","$item")
+
+
+
+
+                for(noteItem in noteListState){
+                    if(noteItem.contains(item))
+                    {
+
+                        filteredList=listOf(noteItem)
+                        Log.d("filteredList", "$filteredList")
+                    }
+
+                }
+
+
+            }
+           DisplayNotesList(filteredList)
+
+
         }
         AnimatedVisibility(
             visible = checked,
@@ -44,7 +79,8 @@ fun ListPreviousNotes() {
             AddNewNote { item ->
                 //updating state with added item
                 noteListState = noteListState + listOf(item)
-            }
+              }
+
         }
         DisplayNotesList(noteListState)
     }
@@ -57,58 +93,43 @@ fun ListPreviousNotes() {
 @Composable
 fun DisplayNotesList(notes: List<String>) {
     val listState = rememberScrollState()
-    val (visible) = remember { mutableStateOf(true) }
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-
-        LazyColumn(
-        ) {
+        LazyColumn (){
 
             items(notes.size) { index ->
-                Row(
-                    //     modifier = Modifier.background(Color.Blue)
-                    modifier = Modifier
-                        .padding(start = 15.dp, top = 15.dp, bottom = 1.dp, end = 15.dp)
-                        .fillMaxSize()
-                        .background(Color.Gray)
-                        .padding(15.dp)
-                        .clickable {
-                        }
-                        .horizontalScroll(listState)
-                        .animateEnterExit(
-                            // Slide in/out the inner box.
-                            enter = slideInVertically(
-                                initialOffsetY = { 1000 * it },
-                                animationSpec = tween(1000)
+
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 15.dp, top = 15.dp, bottom = 1.dp, end = 15.dp)
+                            .fillMaxSize()
+                            .background(Color.Gray)
+                            .padding(15.dp)
+                            .clickable {}
+                            .horizontalScroll(listState)
+                            .animateItemPlacement(
+                                // Slide in/out the inner box.
+                                tween(durationMillis = 250)
                             ),
-                            exit = slideOutVertically()
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
 
-                ) {
-                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
-                    Text(
-                        text = notes[index],
-                        color = if (checked) {
-                            Color.Red
-                        } else {
-                            Color.Black
-                        }
-                    )
-                    Checkbox(checked, onCheckedChange)
-                    //Text("Done")
+                    ) {
+                        val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                        Text(
+                            text = notes[index],
+                            color = if (checked) {
+                                Color.Red
+                            } else {
+                                Color.Black
+                            }
+                        )
+                        Checkbox(checked, onCheckedChange)
 
-
-                }
+                    }
 
 
             }
         }
-    }
+  //  }
 
 }
 
@@ -177,7 +198,6 @@ fun AddNewNote(onNewNoteAdded: (String) -> Unit) {
                                 ) {
                                     Text(
                                         "Add Note To The List",
-
                                         )
                                 }
                             }
@@ -189,5 +209,15 @@ fun AddNewNote(onNewNoteAdded: (String) -> Unit) {
         }
     }
 
+
+}
+
+@Composable
+fun SearchNote(onNoteSearched:(String )-> Unit){
+    var searchText by remember { mutableStateOf("") }
+    TextField(value = searchText, onValueChange ={
+        searchText=it
+        onNoteSearched(searchText)
+    } )
 
 }
