@@ -2,6 +2,7 @@ package com.example.todolistapp
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 
@@ -28,7 +30,7 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                 ListPreviousNotes()
+                ListPreviousNotes()
             }
         }
     }
@@ -57,25 +59,46 @@ class HomeScreen : ComponentActivity() {
                     )
                 )
             }
-            val filteredList : MutableList<String> = arrayListOf()
+            var noteListNewCopy by remember {
+                mutableStateOf(
+                    listOf(
+                        "Drink water",
+                        "Walk",
+                        "run",
+                        "running"
+                    )
+                )
+            }
+
+            var noteListCopy: MutableList<String>
             Row(
                 Modifier
                     .padding(5.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
+                val context = LocalContext.current
                 Checkbox(checked, onCheckedChange)
                 Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
-               /* SearchNote { item ->
-                    Log.d("TAG", item)
-                    for (noteItem in noteListState) {
-                        if (noteItem.contains(item)) {
-                            filteredList = listOf(noteItem) as MutableList<String>
-                            Log.d("filteredList", "$filteredList")
-                    //    DisplayNotesList(notes = filteredList)
-                        }
-                    }
-                }*/
-                SearchNotefunc(noteListState)
+                noteListCopy = noteListState as MutableList<String>
+                val (list, searchTextStatee) = SearchNotefunc(noteListNewCopy)
+                /* if (searchTextStatee == "") {
+                     Log.d("----", "noteListCopy:$noteListCopy")
+                     Log.d("----", "noteListState:$noteListState")
+                     Log.d("----", "noteListNewCopy:$noteListNewCopy")
+                     noteListCopy = noteListNewCopy as MutableList<String>
+                     Log.d("----", "noteListCopy:$noteListCopy")
+
+
+                 } else {
+                     Log.d("searchTextStatee", "not null")
+
+                 }*/
+                if (list.isNotEmpty()) {
+                    noteListState = list
+                } else if (list.isEmpty()) {
+                    (noteListState as MutableList<String>).clear()
+                    Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
+                }
             }
             AnimatedVisibility(
                 visible = checked,
@@ -85,6 +108,7 @@ class HomeScreen : ComponentActivity() {
                 AddNewNote { item ->
                     //updating state with added item
                     noteListState = noteListState + listOf(item)
+                    noteListNewCopy = noteListNewCopy + listOf(item)
                 }
             }
             DisplayNotesList(noteListState)
@@ -95,9 +119,13 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
     @Composable
-    fun SearchNotefunc( noteListState: List<String>) {
-        var filteredList : MutableList<String> = arrayListOf()
+
+    fun SearchNotefunc(
+        noteListState: List<String>
+    ): Pair<List<String>, String> {
+        var filteredList: MutableList<String> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
+
         OutlinedTextField(
             value = searchText,
             onValueChange = {
@@ -107,11 +135,15 @@ class HomeScreen : ComponentActivity() {
         )
         for (noteItem in noteListState) {
             if (noteItem.contains(searchText)) {
-                filteredList = (filteredList+listOf(noteItem)) as MutableList<String>
-                Log.d("filteredList", "$filteredList")
-                //DisplayNotesList(notes = listOf("hey", "hello"))
+                filteredList = (filteredList + listOf(noteItem)) as MutableList<String>
             }
         }
+       /* if (filteredList.isEmpty()) {
+            Log.d("filteredList", "${filteredList.size}")
+
+        }*/
+     //   Log.d("searchText", searchText)
+        return Pair(filteredList, searchText)
     }
 
     @ExperimentalMaterialApi
