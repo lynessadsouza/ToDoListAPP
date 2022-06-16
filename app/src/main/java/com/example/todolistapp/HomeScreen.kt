@@ -10,15 +10,19 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 
 
@@ -29,8 +33,11 @@ class HomeScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            var buttonClickedState by remember { mutableStateOf("") }
+
             ToDoListAPPTheme {
                 ListPreviousNotes()
+
             }
         }
     }
@@ -39,7 +46,9 @@ class HomeScreen : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ListPreviousNotes() {
-        val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+        //val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+        var isButtonVisible by remember { mutableStateOf("") }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,10 +86,50 @@ class HomeScreen : ComponentActivity() {
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
                 val context = LocalContext.current
-                Checkbox(checked, onCheckedChange)
-                Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
-                noteListCopy = noteListState as MutableList<String>
+                //Checkbox(checked, onCheckedChange)
+               // isButtonVisible="false"
+               // Log.d("TAG", isButtonVisible)
                 val list = SearchNotefunc(noteListNewCopy)
+                Button(
+                  modifier=  Modifier.size(60.dp),
+                    shape= CircleShape,
+
+                    onClick = {isButtonVisible="true"
+
+                        Log.d("TAG", isButtonVisible)},
+
+                    ) {
+                  //  Text("Add Note", fontSize = 10.em, ic)
+                //    Icon(R.drawable.ic_baseline_add_24,contentDescription = "content description", tint=Color(0XFF0F9D58))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_add_24),
+                        contentDescription = null // decorative element
+                    )
+                }
+
+                if(isButtonVisible.equals("true"))
+                {
+                    Log.d("TAG", isButtonVisible)
+                    AddNewNote { item ->
+                    //updating state with added item
+                    noteListState = noteListState + listOf(item)
+                    noteListNewCopy = noteListNewCopy + listOf(item)
+                        isButtonVisible="false"
+                        Log.d("TAG", isButtonVisible)
+
+                }
+
+                }
+                else
+                {
+                    //Dont do anything
+                }
+
+
+
+              //  Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
+                noteListCopy = noteListState as MutableList<String>
+             //   val list = SearchNotefunc(noteListNewCopy)
                 if (list.isNotEmpty()) {
                     noteListState = list
                 } else if (list.isEmpty()) {
@@ -93,11 +142,11 @@ class HomeScreen : ComponentActivity() {
              //   enter = fadeIn(),
              //   exit = shrinkOut(shrinkTowards = Alignment.BottomStart, animationSpec = tween(1000))
             //) {
-                AddNewNote { item ->
+               /* AddNewNote { item ->
                     //updating state with added item
                     noteListState = noteListState + listOf(item)
                     noteListNewCopy = noteListNewCopy + listOf(item)
-                }
+                }*/
             //}
             DisplayNotesList(noteListState)
         }
@@ -139,7 +188,7 @@ class HomeScreen : ComponentActivity() {
             items(notes.size) { index ->
                 Row(
                     modifier = Modifier
-                        .padding(start = 15.dp, top = 15.dp, bottom = 1.dp, end = 15.dp)
+                        .padding(start = 10.dp, top = 8.dp, bottom = 1.dp, end = 10.dp)
                         .fillMaxSize()
                         .background(Color.White)
                         .shadow(2.dp)
@@ -148,7 +197,7 @@ class HomeScreen : ComponentActivity() {
                             color = Color.Blue,
                             shape = RoundedCornerShape(5.dp)
                         )
-                        .padding(15.dp)
+                        .padding(10.dp)
                         .clickable {}
                         .horizontalScroll(listState)
                         .animateItemPlacement(
