@@ -1,6 +1,7 @@
 package com.example.todolistapp
 
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -9,6 +10,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Bottom
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,12 +88,10 @@ class HomeScreen : ComponentActivity() {
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
                 val context = LocalContext.current
-                //Checkbox(checked, onCheckedChange)
-               // isButtonVisible="false"
-               // Log.d("TAG", isButtonVisible)
                 val list = SearchNotefunc(noteListNewCopy)
-                Button(
-                  modifier=  Modifier.size(60.dp),
+                FloatingActionButton(
+
+                  modifier=  Modifier.size(60.dp).align(Alignment.Bottom),
                     shape= CircleShape,
 
                     onClick = {isButtonVisible="true"
@@ -168,6 +168,7 @@ class HomeScreen : ComponentActivity() {
             onValueChange = {
                 searchText = it
             },
+            Modifier.padding(bottom = 35.dp),
             label = { Text(text = "Search Keyword Here") },
         )
         for (noteItem in listNotes) {
@@ -184,42 +185,58 @@ class HomeScreen : ComponentActivity() {
     @Composable
     fun DisplayNotesList(notes: List<String>) {
         val listState = rememberScrollState()
+
+
         LazyColumn() {
             items(notes.size) { index ->
-                Row(
-                    modifier = Modifier
-                        .padding(start = 10.dp, top = 8.dp, bottom = 1.dp, end = 10.dp)
-                        .fillMaxSize()
-                        .background(Color.White)
-                        .shadow(2.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color.Blue,
-                            shape = RoundedCornerShape(5.dp)
-                        )
-                        .padding(10.dp)
-                        .clickable {}
-                        .horizontalScroll(listState)
-                        .animateItemPlacement(
-                            // Slide in/out the inner box.
-                            tween(durationMillis = 250)
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
 
+
+                Card(
+                    modifier = Modifier.padding(start = 20.dp,top=10.dp, bottom = 10.dp, end=20.dp).fillMaxWidth()
+                    .background(Color.Blue),
+                    shape = RoundedCornerShape(8.dp),
+                    backgroundColor = MaterialTheme.colors.surface,
                 ) {
-                    val (checked, onCheckedChange) = remember { mutableStateOf(false) }
-                    Text(
-                        modifier = Modifier.animateItemPlacement(tween(durationMillis = 1000)),
-                        text = notes[index],
-                        color = if (checked) {
-                            Color.Red
-                        } else {
-                            Color.Black
-                        }
-                    )
-                    Checkbox(checked, onCheckedChange)
+
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 10.dp, top = 1.dp, bottom = 1.dp, end = 10.dp)
+                        //    .fillMaxSize()
+                            .background(Color.White)
+                            //.shadow(2.dp)
+                            /*.border(
+                                width = 1.dp,
+                                color = Color.Blue,
+                                shape = RoundedCornerShape(5.dp)
+                            )*/
+                            .clickable {}
+                            .horizontalScroll(listState)
+                            .animateItemPlacement(
+                                // Slide in/out the inner box.
+                                tween(durationMillis = 250)
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
+                        val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                        Text(
+                            modifier = Modifier.animateItemPlacement(tween(durationMillis = 1000)),
+                            text = notes[index],
+                            color = if (checked) {
+                                Color.Red
+                            } else {
+                                Color.Black
+                            }
+                        )
+                        Checkbox(checked, onCheckedChange)
+                    }
+
                 }
+
+
+
+
             }
         }
     }
@@ -309,7 +326,7 @@ class HomeScreen : ComponentActivity() {
                 searchText = it
                 onNoteSearched(searchText)
             },
-            label = { Text(text = "Search Keyword Here") },
+            label = { Text(text = "Search Keyword Here")},
         )
     }
 }
