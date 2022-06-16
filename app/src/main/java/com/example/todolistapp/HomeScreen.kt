@@ -80,19 +80,7 @@ class HomeScreen : ComponentActivity() {
                 Checkbox(checked, onCheckedChange)
                 Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
                 noteListCopy = noteListState as MutableList<String>
-                val (list, searchTextStatee) = SearchNotefunc(noteListNewCopy)
-                /* if (searchTextStatee == "") {
-                     Log.d("----", "noteListCopy:$noteListCopy")
-                     Log.d("----", "noteListState:$noteListState")
-                     Log.d("----", "noteListNewCopy:$noteListNewCopy")
-                     noteListCopy = noteListNewCopy as MutableList<String>
-                     Log.d("----", "noteListCopy:$noteListCopy")
-
-
-                 } else {
-                     Log.d("searchTextStatee", "not null")
-
-                 }*/
+                val list = SearchNotefunc(noteListNewCopy)
                 if (list.isNotEmpty()) {
                     noteListState = list
                 } else if (list.isEmpty()) {
@@ -100,17 +88,17 @@ class HomeScreen : ComponentActivity() {
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
-            AnimatedVisibility(
-                visible = checked,
-                enter = fadeIn(),
-                exit = shrinkOut(shrinkTowards = Alignment.BottomStart, animationSpec = tween(1000))
-            ) {
+           // AnimatedVisibility(
+             //   visible = checked,
+             //   enter = fadeIn(),
+             //   exit = shrinkOut(shrinkTowards = Alignment.BottomStart, animationSpec = tween(1000))
+            //) {
                 AddNewNote { item ->
                     //updating state with added item
                     noteListState = noteListState + listOf(item)
                     noteListNewCopy = noteListNewCopy + listOf(item)
                 }
-            }
+            //}
             DisplayNotesList(noteListState)
         }
     }
@@ -121,8 +109,8 @@ class HomeScreen : ComponentActivity() {
     @Composable
 
     fun SearchNotefunc(
-        noteListState: List<String>
-    ): Pair<List<String>, String> {
+        listNotes: List<String>
+    ): List<String> {
         var filteredList: MutableList<String> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
 
@@ -133,17 +121,12 @@ class HomeScreen : ComponentActivity() {
             },
             label = { Text(text = "Search Keyword Here") },
         )
-        for (noteItem in noteListState) {
+        for (noteItem in listNotes) {
             if (noteItem.contains(searchText)) {
                 filteredList = (filteredList + listOf(noteItem)) as MutableList<String>
             }
         }
-       /* if (filteredList.isEmpty()) {
-            Log.d("filteredList", "${filteredList.size}")
-
-        }*/
-     //   Log.d("searchText", searchText)
-        return Pair(filteredList, searchText)
+        return filteredList
     }
 
     @ExperimentalMaterialApi
@@ -200,11 +183,11 @@ class HomeScreen : ComponentActivity() {
         val (visible) = remember { mutableStateOf(true) }
         var text by remember { mutableStateOf("") }
 
-        AnimatedVisibility(
-            visible = visible,
-            enter = slideInVertically(initialOffsetY = { 9000 * it }),
-            exit = fadeOut()
-        ) {
+     //   AnimatedVisibility(
+        //    visible = visible,
+         //   enter = slideInVertically(initialOffsetY = { 9000 * it }),
+         //   exit = fadeOut()
+       // ) {
             if (openDialog.value) {
                 AlertDialog(
                     onDismissRequest = {
@@ -212,12 +195,12 @@ class HomeScreen : ComponentActivity() {
                     },
                     title = {
                         Text(
-                            modifier = Modifier.animateEnterExit(
-                                enter = slideInVertically(
-                                    initialOffsetY = { 9000 * it },
-                                ),
-                                exit = slideOutVertically()
-                            ),
+                         //   modifier = Modifier.animateEnterExit(
+                           //     enter = slideInVertically(
+                            //        initialOffsetY = { 9000 * it },
+                            //    ),
+                            //    exit = slideOutVertically()
+                         ///   ),
 
                             text = "Add Note Description"
 
@@ -264,7 +247,7 @@ class HomeScreen : ComponentActivity() {
                     },
                 )
             }
-        }
+       // }
     }
 
     @Composable
