@@ -1,16 +1,15 @@
 package com.example.todolistapp
 
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
+import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.*
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Bottom
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,14 +17,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
+import kotlinx.coroutines.delay
 
 
 @ExperimentalAnimationApi
@@ -35,11 +34,8 @@ class HomeScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var buttonClickedState by remember { mutableStateOf("") }
-
             ToDoListAPPTheme {
                 ListPreviousNotes()
-
             }
         }
     }
@@ -48,9 +44,7 @@ class HomeScreen : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ListPreviousNotes() {
-        //val (checked, onCheckedChange) = remember { mutableStateOf(false) }
         var isButtonVisible by remember { mutableStateOf("") }
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,56 +74,62 @@ class HomeScreen : ComponentActivity() {
                     )
                 )
             }
-
-            var noteListCopy: MutableList<String>
             Row(
                 Modifier
-                    .padding(5.dp)
+                    .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
+                val scale = remember { androidx.compose.animation.core.Animatable(0f) }
                 val context = LocalContext.current
                 val list = SearchNotefunc(noteListNewCopy)
+                LaunchedEffect(key1 = true) {
+                    scale.animateTo(
+                        targetValue = 1f,
+                        animationSpec = tween(
+                            durationMillis = 500,
+                            easing = {
+                                OvershootInterpolator(2f).getInterpolation(it)
+                            }
+                        )
+                    )
+                    delay(3000L)
+                }
+
                 FloatingActionButton(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .align(Alignment.Top)
+                        .scale(scale.value)
+                        .padding(15.dp),
+                    shape = CircleShape,
+                    onClick = {
+                        isButtonVisible = "true"
 
-                  modifier=  Modifier.size(60.dp).align(Alignment.Bottom),
-                    shape= CircleShape,
-
-                    onClick = {isButtonVisible="true"
-
-                        Log.d("TAG", isButtonVisible)},
+                        Log.d("TAG", isButtonVisible)
+                    },
 
                     ) {
-                  //  Text("Add Note", fontSize = 10.em, ic)
-                //    Icon(R.drawable.ic_baseline_add_24,contentDescription = "content description", tint=Color(0XFF0F9D58))
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_add_24),
                         contentDescription = null // decorative element
                     )
                 }
 
-                if(isButtonVisible.equals("true"))
-                {
+                if (isButtonVisible.equals("true")) {
                     Log.d("TAG", isButtonVisible)
                     AddNewNote { item ->
-                    //updating state with added item
-                    noteListState = noteListState + listOf(item)
-                    noteListNewCopy = noteListNewCopy + listOf(item)
-                        isButtonVisible="false"
+                        //updating state with added item
+                        noteListState = noteListState + listOf(item)
+                        noteListNewCopy = noteListNewCopy + listOf(item)
+                        isButtonVisible = "false"
                         Log.d("TAG", isButtonVisible)
 
-                }
+                    }
+
+                } else {
+                    Log.d("TAG", "Dont do anything ")
 
                 }
-                else
-                {
-                    //Dont do anything
-                }
-
-
-
-              //  Text("Add Note ", modifier = Modifier.padding(top = 12.dp))
-                noteListCopy = noteListState as MutableList<String>
-             //   val list = SearchNotefunc(noteListNewCopy)
                 if (list.isNotEmpty()) {
                     noteListState = list
                 } else if (list.isEmpty()) {
@@ -137,17 +137,6 @@ class HomeScreen : ComponentActivity() {
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
-           // AnimatedVisibility(
-             //   visible = checked,
-             //   enter = fadeIn(),
-             //   exit = shrinkOut(shrinkTowards = Alignment.BottomStart, animationSpec = tween(1000))
-            //) {
-               /* AddNewNote { item ->
-                    //updating state with added item
-                    noteListState = noteListState + listOf(item)
-                    noteListNewCopy = noteListNewCopy + listOf(item)
-                }*/
-            //}
             DisplayNotesList(noteListState)
         }
     }
@@ -162,7 +151,6 @@ class HomeScreen : ComponentActivity() {
     ): List<String> {
         var filteredList: MutableList<String> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
-
         OutlinedTextField(
             value = searchText,
             onValueChange = {
@@ -185,58 +173,61 @@ class HomeScreen : ComponentActivity() {
     @Composable
     fun DisplayNotesList(notes: List<String>) {
         val listState = rememberScrollState()
+        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
+        LaunchedEffect(key1 = true) {
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = 500,
+                    easing = { animation ->
+                        OvershootInterpolator(2f).getInterpolation(animation)
+                    }
+                )
+            )
+            delay(3000L)
+        }
 
+        LazyColumn(modifier = Modifier.scale(scale.value)) {
 
-        LazyColumn() {
             items(notes.size) { index ->
-
-
                 Card(
-                    modifier = Modifier.padding(start = 20.dp,top=10.dp, bottom = 10.dp, end=20.dp).fillMaxWidth()
-                    .background(Color.Blue),
+                    modifier = Modifier
+                        .padding(
+                            start = 20.dp,
+                            top = 10.dp,
+                            bottom = 10.dp,
+                            end = 20.dp
+                        )
+                        .fillMaxWidth()
+                        .background(Color.Blue),
+                    /*.scale(scale.value),*/
                     shape = RoundedCornerShape(8.dp),
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
-
                     Row(
                         modifier = Modifier
                             .padding(start = 10.dp, top = 1.dp, bottom = 1.dp, end = 10.dp)
-                        //    .fillMaxSize()
                             .background(Color.White)
-                            //.shadow(2.dp)
-                            /*.border(
-                                width = 1.dp,
-                                color = Color.Blue,
-                                shape = RoundedCornerShape(5.dp)
-                            )*/
                             .clickable {}
-                            .horizontalScroll(listState)
-                            .animateItemPlacement(
-                                // Slide in/out the inner box.
-                                tween(durationMillis = 250)
-                            ),
+                            .horizontalScroll(listState),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
 
                     ) {
                         val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+
+
                         Text(
-                            modifier = Modifier.animateItemPlacement(tween(durationMillis = 1000)),
                             text = notes[index],
                             color = if (checked) {
-                                Color.Red
+                                Color.Blue
                             } else {
                                 Color.Black
                             }
                         )
                         Checkbox(checked, onCheckedChange)
                     }
-
                 }
-
-
-
-
             }
         }
     }
@@ -245,88 +236,74 @@ class HomeScreen : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun AddNewNote(onNewNoteAdded: (String) -> Unit) {
+        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         val openDialog = remember { mutableStateOf(true) }
-        val (visible) = remember { mutableStateOf(true) }
         var text by remember { mutableStateOf("") }
 
-     //   AnimatedVisibility(
-        //    visible = visible,
-         //   enter = slideInVertically(initialOffsetY = { 9000 * it }),
-         //   exit = fadeOut()
-       // ) {
-            if (openDialog.value) {
-                AlertDialog(
-                    onDismissRequest = {
-                        openDialog.value = false
-                    },
-                    title = {
-                        Text(
-                         //   modifier = Modifier.animateEnterExit(
-                           //     enter = slideInVertically(
-                            //        initialOffsetY = { 9000 * it },
-                            //    ),
-                            //    exit = slideOutVertically()
-                         ///   ),
-
-                            text = "Add Note Description"
+        LaunchedEffect(key1 = true) {
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = 500,
+                    easing = {
+                        OvershootInterpolator(2f).getInterpolation(it)
+                    }
+                )
+            )
+            delay(3000L)
+        }
 
 
+        if (openDialog.value) {
+            AlertDialog(
+                modifier = Modifier.scale(scale.value),
+                onDismissRequest = {
+                    openDialog.value = false
+                },
+                title = {
+                    Text(
+                        text = "Add Note Description"
+                    )
+                },
+                text = {
+                    Column() {
+                        TextField(
+                            value = text,
+                            onValueChange = { text = it }
                         )
-                    },
-                    text = {
-                        Column() {
-                            TextField(
-                                value = text,
-                                onValueChange = { text = it }
-                            )
-                            Text("Note description")
-                        }
-                    },
-                    buttons = {
-                        Row(
-                            modifier = Modifier.padding(all = 8.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            val addNoteButtonState by remember { mutableStateOf(false) }
-                            if (addNoteButtonState) {
-                                onNewNoteAdded(text)
-                            } else {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            if (text != "") {
-                                                onNewNoteAdded(text)
-                                            }
-                                            //  addNoteButtonState = true
-
-                                            openDialog.value = false
+                        Text("Note description")
+                    }
+                },
+                buttons = {
+                    Row(
+                        modifier = Modifier.padding(all = 8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        val addNoteButtonState by remember { mutableStateOf(false) }
+                        if (addNoteButtonState) {
+                            onNewNoteAdded(text)
+                        } else {
+                            Box(contentAlignment = Alignment.Center) {
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        if (text != "") {
+                                            onNewNoteAdded(text)
                                         }
-                                    ) {
-                                        Text(
-                                            "Add Note To The List",
-                                        )
+                                        //  addNoteButtonState = true
+
+                                        openDialog.value = false
                                     }
+                                ) {
+                                    Text(
+                                        "Add Note To The List",
+                                    )
                                 }
                             }
                         }
-                    },
-                )
-            }
-       // }
-    }
-
-    @Composable
-    fun SearchNote(onNoteSearched: (String) -> Unit) {
-        var searchText by remember { mutableStateOf("") }
-
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = {
-                searchText = it
-                onNoteSearched(searchText)
-            },
-            label = { Text(text = "Search Keyword Here")},
-        )
+                    }
+                },
+            )
+        }
     }
 }
