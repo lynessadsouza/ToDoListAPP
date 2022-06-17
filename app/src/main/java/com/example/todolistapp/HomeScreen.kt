@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
@@ -74,6 +75,8 @@ class HomeScreen : ComponentActivity() {
                     )
                 )
             }
+
+
             Row(
                 Modifier
                     .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
@@ -81,7 +84,7 @@ class HomeScreen : ComponentActivity() {
             ) {
                 val scale = remember { androidx.compose.animation.core.Animatable(0f) }
                 val context = LocalContext.current
-                val list = SearchNotefunc(noteListNewCopy)
+                val list = searchNote(noteListNewCopy)
                 LaunchedEffect(key1 = true) {
                     scale.animateTo(
                         targetValue = 1f,
@@ -123,9 +126,7 @@ class HomeScreen : ComponentActivity() {
                         noteListNewCopy = noteListNewCopy + listOf(item)
                         isButtonVisible = "false"
                         Log.d("TAG", isButtonVisible)
-
                     }
-
                 } else {
                     Log.d("TAG", "Dont do anything ")
 
@@ -137,6 +138,12 @@ class HomeScreen : ComponentActivity() {
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
+
+
+            Text(text = "My ToDo Notes", fontWeight = FontWeight.Bold, modifier = Modifier
+                .padding(start= 20.dp, bottom = 10.dp)
+
+            )
             DisplayNotesList(noteListState)
         }
     }
@@ -145,8 +152,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
     @Composable
-
-    fun SearchNotefunc(
+    fun searchNote(
         listNotes: List<String>
     ): List<String> {
         var filteredList: MutableList<String> = arrayListOf()
@@ -232,7 +238,7 @@ class HomeScreen : ComponentActivity() {
         }
     }
 
-    //onNewNoteAdded - like a listner which will update
+    //onNewNoteAdded - like a listnr which will update
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun AddNewNote(onNewNoteAdded: (String) -> Unit) {
@@ -307,3 +313,11 @@ class HomeScreen : ComponentActivity() {
         }
     }
 }
+
+fun testFeature()
+{
+    Log.d("Tag","testFeature")
+}
+
+
+//Testing source tree

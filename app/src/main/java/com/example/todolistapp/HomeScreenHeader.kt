@@ -77,7 +77,7 @@ fun GreetingSection(
            ) {
                 // heading text view
                 Text(
-                    text = "Good morning, $name",
+                    text = "Good Day, $name",
                     style = MaterialTheme.typography.h5
                 )
                 /*Text(
