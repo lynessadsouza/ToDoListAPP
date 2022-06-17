@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoListAPP">
         <activity
+            android:name=".AddTaskScreen"
+            android:exported="false"
+            android:label="@string/title_activity_add_task"
+            android:theme="@style/Theme.ToDoListAPP.NoActionBar" />
+        <activity
             android:name=".HomeScreen"
             android:exported="true"
             android:label="@string/app_name"

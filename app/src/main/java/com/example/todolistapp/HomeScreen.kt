@@ -1,5 +1,6 @@
 package com.example.todolistapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.animation.OvershootInterpolator
@@ -37,8 +38,21 @@ class HomeScreen : ComponentActivity() {
         setContent {
             ToDoListAPPTheme {
                 ListPreviousNotes()
+                Log.d("TAG", "setContent")
+                ShowData()
             }
         }
+    }
+@Composable
+     fun ShowData() {
+
+            val context = LocalContext.current
+            val intent = (context as HomeScreen).intent
+            val title = intent.getStringExtra("title")
+            val priority = intent.getStringExtra("priority")
+            val description = intent.getStringExtra("description")
+
+  //  Log.d("HomeScreen", "$title, $priority , $description")
     }
 
     @ExperimentalMaterialApi
@@ -55,26 +69,29 @@ class HomeScreen : ComponentActivity() {
 
         ) {
             HomeScreenHeader()
+            val context = LocalContext.current
+            val intent = (context as HomeScreen).intent
+            val title = intent.getStringExtra("title")
+            val priority = intent.getStringExtra("priority")
+            val description = intent.getStringExtra("description")
+            Log.d("HomeScreen", "$title, $priority , $description")
+
+
             var noteListState by remember {
                 mutableStateOf(
-                    listOf(
-                        "Drink water",
-                        "Walk",
-                        "run",
-                        "running"
-                    )
-                )
+                    listOf( Notes ("Drink water", "High", "Drink 2 Glasses"))
+            )
             }
             var noteListNewCopy by remember {
                 mutableStateOf(
-                    listOf(
-                        "Drink water",
-                        "Walk",
-                        "run",
-                        "running"
+                    listOf( Notes ("hey", "High", "Drink 2 Glasses"),
+                     Notes (" water", "High", "Drink 2 Glasses"),
+                     Notes ("Drink ", "High", "Drink 2 Glasses")
+
                     )
                 )
             }
+
 
 
             Row(
@@ -82,6 +99,9 @@ class HomeScreen : ComponentActivity() {
                     .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
+                // val context = LocalContext.current
+
+
                 val scale = remember { androidx.compose.animation.core.Animatable(0f) }
                 val context = LocalContext.current
                 val list = searchNote(noteListNewCopy)
@@ -106,24 +126,25 @@ class HomeScreen : ComponentActivity() {
                         .padding(15.dp),
                     shape = CircleShape,
                     onClick = {
+                        context.startActivity(Intent(context, AddTaskScreen::class.java))
+
+
                         isButtonVisible = "true"
 
                         Log.d("TAG", isButtonVisible)
                     },
-
                     ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_add_24),
                         contentDescription = null // decorative element
                     )
                 }
-
                 if (isButtonVisible.equals("true")) {
                     Log.d("TAG", isButtonVisible)
-                    AddNewNote { item ->
+                    AddNewNote {item->
                         //updating state with added item
-                        noteListState = noteListState + listOf(item)
-                        noteListNewCopy = noteListNewCopy + listOf(item)
+                        noteListState = (noteListState + listOf(item)) as MutableList<Notes>
+                        noteListNewCopy = noteListState + listOf(item) as MutableList<Notes>
                         isButtonVisible = "false"
                         Log.d("TAG", isButtonVisible)
                     }
@@ -138,24 +159,24 @@ class HomeScreen : ComponentActivity() {
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
-
-
-            Text(text = "My ToDo Notes", fontWeight = FontWeight.Bold, modifier = Modifier
-                .padding(start= 20.dp, bottom = 10.dp)
+            Text(
+                text = "My ToDo Notes", fontWeight = FontWeight.Bold, modifier = Modifier
+                    .padding(start = 20.dp, bottom = 10.dp)
 
             )
             DisplayNotesList(noteListState)
         }
     }
 
+
     @OptIn(ExperimentalAnimationApi::class)
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
     @Composable
     fun searchNote(
-        listNotes: List<String>
-    ): List<String> {
-        var filteredList: MutableList<String> = arrayListOf()
+        listNotes: List<Notes>
+    ): List<Notes> {
+        var filteredList: MutableList<Notes> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
         OutlinedTextField(
             value = searchText,
@@ -166,10 +187,15 @@ class HomeScreen : ComponentActivity() {
             label = { Text(text = "Search Keyword Here") },
         )
         for (noteItem in listNotes) {
-            if (noteItem.contains(searchText)) {
-                filteredList = (filteredList + listOf(noteItem)) as MutableList<String>
+
+            if (noteItem.title.contains(searchText))
+
+           // if (noteItem..contains(searchText)) {
+                filteredList = (filteredList + listOf(noteItem)) as MutableList<Notes>
             }
-        }
+
+
+
         return filteredList
     }
 
@@ -177,7 +203,8 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun DisplayNotesList(notes: List<String>) {
+    fun DisplayNotesList(notes: List<Notes>) {
+
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -194,7 +221,6 @@ class HomeScreen : ComponentActivity() {
         }
 
         LazyColumn(modifier = Modifier.scale(scale.value)) {
-
             items(notes.size) { index ->
                 Card(
                     modifier = Modifier
@@ -206,7 +232,6 @@ class HomeScreen : ComponentActivity() {
                         )
                         .fillMaxWidth()
                         .background(Color.Blue),
-                    /*.scale(scale.value),*/
                     shape = RoundedCornerShape(8.dp),
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
@@ -224,7 +249,7 @@ class HomeScreen : ComponentActivity() {
 
 
                         Text(
-                            text = notes[index],
+                            text= notes[index].title,
                             color = if (checked) {
                                 Color.Blue
                             } else {
@@ -313,11 +338,3 @@ class HomeScreen : ComponentActivity() {
         }
     }
 }
-
-fun testFeature()
-{
-    Log.d("Tag","testFeature")
-}
-
-
-//Testing source tree
