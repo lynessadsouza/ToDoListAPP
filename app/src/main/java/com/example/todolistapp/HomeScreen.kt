@@ -62,9 +62,6 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                /*FabAnywhere(FabPosition.End, onClick = { }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add")
-                }*/
                 ListPreviousNotes()
             }
         }
@@ -190,7 +187,7 @@ class HomeScreen : ComponentActivity() {
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding( top = 1.dp, bottom = 1.dp, end = 10.dp)
+                            .padding(top = 1.dp, bottom = 1.dp, end = 10.dp)
                             .background(Color.White)
                             .horizontalScroll(listState),
                         verticalAlignment = Alignment.CenterVertically
@@ -257,30 +254,13 @@ class HomeScreen : ComponentActivity() {
     val startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-              //  val intent = result.data
+                val intent = result.data
                 val newNoteDetails = intent?.getSerializableExtra("noteItem") as Notes
                 noteListState = noteListState + newNoteDetails
                 noteListNewCopy = noteListNewCopy + newNoteDetails
             }
         }
 
-    @Composable
-    fun FabAnywhere(
-        fabPosition: FabPosition,
-        onClick: () -> Unit,
-        modifier: Modifier = Modifier,
-        content: @Composable () -> Unit
-    ) {
-        Scaffold(
-            floatingActionButtonPosition = fabPosition,
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = onClick,
-                    modifier = modifier,
-                    content = content
-                )
-            }
-        ) {}
-    }
+
 }
 
