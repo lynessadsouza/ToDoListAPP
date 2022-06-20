@@ -1,5 +1,4 @@
 package com.example.todolistapp
-
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -53,8 +52,7 @@ fun AddTask() {
     var description by remember { mutableStateOf("") }
     val priority = listOf("High", "Medium", "Low")
     var expanded by remember { mutableStateOf(false) }
-    var selectedPriority by remember { mutableStateOf(priority[0]) }
-
+    var selectedPriority by remember { mutableStateOf(priority[1]) }
 
     Box(
         modifier = Modifier
@@ -131,10 +129,8 @@ fun AddTask() {
                     label = { Text(text = "Description") },
                 )
                 Button(onClick = {
-
                     if (title == "" || description == ""){
                         Toast.makeText(context, "Please fill out all the details ", Toast.LENGTH_LONG).show()
-
                     }
                     else
                     {
@@ -143,17 +139,11 @@ fun AddTask() {
                         intent.putExtra("noteItem", note)
                         getActivity(context)?.setResult(Activity.RESULT_OK, intent);
                         getActivity(context)?.finish();
-
                     }
-
-
                 }) {
                     Text("Add Task")
                 }
-
             }
         }
-
-
     }
 }

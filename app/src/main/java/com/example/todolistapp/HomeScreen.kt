@@ -37,25 +37,22 @@ import androidx.compose.ui.unit.sp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
 
-
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
-
-    var noteListState by mutableStateOf(
-        listOf<Notes>(
+    var filteredNoteList by mutableStateOf(
+        listOf(
             Notes("Water", "High", "Drink 2 Glasses")
          )
     )
-    var noteListNewCopy by mutableStateOf(
-        listOf<Notes>(
+    var listOfNotes by mutableStateOf(
+        listOf(
             Notes("Water", "High", "Drink 2 Glasses"),
             Notes("Walk", "Medium", "Walk  "),
             Notes("Take a break ", "Low", " 5 Mins break "),
             Notes("Drink ", "High", "Drink water")
         )
     )
-
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +83,7 @@ class HomeScreen : ComponentActivity() {
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
                 val context = LocalContext.current
-                val list = searchNote(noteListNewCopy)
+                val list = searchNote(listOfNotes)
                 FloatingActionButton(
                     modifier = Modifier
                         .size(60.dp)
@@ -105,9 +102,9 @@ class HomeScreen : ComponentActivity() {
                 }
 
                 if (list.isNotEmpty()) {
-                    noteListState = list
+                    filteredNoteList = list
                 } else if (list.isEmpty()) {
-                    (noteListState as MutableList<String>).clear()
+                    (filteredNoteList as MutableList<String>).clear()
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
@@ -116,10 +113,9 @@ class HomeScreen : ComponentActivity() {
                     .padding(start = 20.dp, bottom = 10.dp)
 
             )
-            DisplayNotesList(noteListState)
+            displayNotes(filteredNoteList)
         }
     }
-
 
     @OptIn(ExperimentalAnimationApi::class)
     @ExperimentalAnimationApi
@@ -153,7 +149,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun DisplayNotesList(notes: List<Notes>) {
+    fun displayNotes(notes: List<Notes>) {
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -256,11 +252,9 @@ class HomeScreen : ComponentActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val intent = result.data
                 val newNoteDetails = intent?.getSerializableExtra("noteItem") as Notes
-                noteListState = noteListState + newNoteDetails
-                noteListNewCopy = noteListNewCopy + newNoteDetails
+                filteredNoteList = filteredNoteList + newNoteDetails
+                listOfNotes = listOfNotes + newNoteDetails
             }
         }
-
-
 }
 
