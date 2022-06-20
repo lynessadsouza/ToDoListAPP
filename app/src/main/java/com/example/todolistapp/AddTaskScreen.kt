@@ -1,15 +1,18 @@
 package com.example.todolistapp
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -20,9 +23,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
+import com.google.android.material.internal.ContextUtils.getActivity
 
 class AddTaskScreen : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
@@ -40,6 +43,7 @@ class AddTaskScreen : ComponentActivity() {
     }
 }
 
+@SuppressLint("RestrictedApi")
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -123,11 +127,15 @@ fun AddTask() {
                    label = { Text(text = "Description") },
                )
                Button(onClick = {
-                   val intent = Intent(context, HomeScreen::class.java)
-                   intent.putExtra("title", title)
-                   intent.putExtra("priority", selectedOptionText)
-                   intent.putExtra("description", description)
-                   context.startActivity(intent)
+
+                 //  setResult(Activity.Result_OK, yourIntentResult)
+                   val intent = Intent()
+                   var note=Notes(title, selectedOptionText, description)
+                //   setResult(123,intent)
+                   intent.putExtra("noteItem", note)
+                   getActivity(context)?.setResult(Activity.RESULT_OK, intent);
+                   getActivity(context)?.finish();
+
                }) {
                    Text("Click")
                }
