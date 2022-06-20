@@ -18,16 +18,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
 
@@ -38,18 +44,15 @@ class HomeScreen : ComponentActivity() {
 
     var noteListState by mutableStateOf(
         listOf<Notes>(
-            Notes("hey", "High", "Drink 2 Glasses"),
-            Notes(" water", "High", "Drink 2 Glasses"),
-            Notes("Drink ", "High", "Drink 2 Glasses"),
-            Notes("Drink ", "High", "Drink 2 Glasses")
-        )
+            Notes("Water", "High", "Drink 2 Glasses")
+         )
     )
     var noteListNewCopy by mutableStateOf(
         listOf<Notes>(
-            Notes("hey", "High", "Drink 2 Glasses"),
-            Notes(" water", "High", "Drink 2 Glasses"),
-            Notes("Drink ", "High", "Drink 2 Glasses"),
-            Notes("Drink ", "High", "Drink 2 Glasses")
+            Notes("Water", "High", "Drink 2 Glasses"),
+            Notes("Walk", "Medium", "Walk  "),
+            Notes("Take a break ", "Low", " 5 Mins break "),
+            Notes("Drink ", "High", "Drink water")
         )
     )
 
@@ -59,6 +62,9 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
+                /*FabAnywhere(FabPosition.End, onClick = { }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add")
+                }*/
                 ListPreviousNotes()
             }
         }
@@ -68,7 +74,6 @@ class HomeScreen : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ListPreviousNotes() {
-        var isButtonVisible by remember { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,12 +106,7 @@ class HomeScreen : ComponentActivity() {
                         contentDescription = null // decorative element
                     )
                 }
-                if (isButtonVisible == "true") {
-                    Log.d("TAG", isButtonVisible)
-                } else {
-                    Log.d("TAG", "Dont do anything ")
 
-                }
                 if (list.isNotEmpty()) {
                     noteListState = list
                 } else if (list.isEmpty()) {
@@ -184,32 +184,68 @@ class HomeScreen : ComponentActivity() {
                         )
                         .shadow(1.dp)
                         .fillMaxWidth()
-                        .background(Color.Blue),
+                        .background(Color.White),
                     shape = RoundedCornerShape(8.dp),
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(start = 10.dp, top = 1.dp, bottom = 1.dp, end = 10.dp)
+                            .padding( top = 1.dp, bottom = 1.dp, end = 10.dp)
                             .background(Color.White)
-                            .clickable {}
                             .horizontalScroll(listState),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
 
                     ) {
+
                         val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                        Image(
+                            painter = painterResource(R.drawable.priority),
+                            contentDescription = "",
+                            colorFilter =
+                            if(notes[index].priority.equals("High")){
+                                ColorFilter.tint(Color.Red)
+                            }
+                            else if (notes[index].priority.equals("Medium")){
+                                ColorFilter.tint(Color.Yellow)
+                            }
+                            else
+                            {
+                                ColorFilter.tint(Color.Green)
+                            }
+                        )
+                        Column(
 
+                            Modifier
+                                .width(290.dp)
+                                .padding(start = 10.dp)
 
-                        notes[index].title?.let {
-                            Text(
-                                text = it,
-                                color = if (checked) {
-                                    Color.Blue
-                                } else {
-                                    Color.Black
-                                }
-                            )
+                        ){
+                            notes[index].title?.let {
+                                Text(
+                                    textAlign = TextAlign.Start,
+                                    fontWeight=Bold,
+                                    modifier= Modifier.padding(bottom = 5.dp),
+                                    text = it,
+                                    color = if (checked) {
+                                        Color.Blue
+                                    } else {
+                                        Color.Black
+                                    }
+                                )
+                            }
+                            notes[index].description?.let {
+                                Text(
+                                    fontSize = 13.sp,
+                                    text = it,
+                                    color = if (checked) {
+                                        Color.Blue
+                                    } else {
+                                        Color.Black
+                                    }
+
+                                )
+                            }
+
                         }
                         Checkbox(checked, onCheckedChange)
                     }
@@ -221,11 +257,30 @@ class HomeScreen : ComponentActivity() {
     val startForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val intent = result.data
+              //  val intent = result.data
                 val newNoteDetails = intent?.getSerializableExtra("noteItem") as Notes
                 noteListState = noteListState + newNoteDetails
                 noteListNewCopy = noteListNewCopy + newNoteDetails
             }
         }
+
+    @Composable
+    fun FabAnywhere(
+        fabPosition: FabPosition,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit
+    ) {
+        Scaffold(
+            floatingActionButtonPosition = fabPosition,
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = onClick,
+                    modifier = modifier,
+                    content = content
+                )
+            }
+        ) {}
+    }
 }
 

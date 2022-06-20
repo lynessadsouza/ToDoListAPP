@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import com.google.android.material.internal.ContextUtils.getActivity
@@ -68,8 +69,13 @@ fun AddTask() {
        Column() {
            val context = LocalContext.current
 
-           Text(text = "Add Your Note Details Here ", fontWeight = FontWeight.Black)
-           Column() {
+           Text(text = "Add Your Note Details Here ",
+               fontWeight = FontWeight.Black,
+           modifier = Modifier.padding(bottom = 20.dp)
+               )
+           Column(
+               horizontalAlignment = Alignment.CenterHorizontally
+           ) {
                OutlinedTextField(
                    value = title,
                    onValueChange = {
@@ -127,17 +133,14 @@ fun AddTask() {
                    label = { Text(text = "Description") },
                )
                Button(onClick = {
-
-                 //  setResult(Activity.Result_OK, yourIntentResult)
                    val intent = Intent()
-                   var note=Notes(title, selectedOptionText, description)
-                //   setResult(123,intent)
+                   val note=Notes(title, selectedOptionText, description)
                    intent.putExtra("noteItem", note)
                    getActivity(context)?.setResult(Activity.RESULT_OK, intent);
                    getActivity(context)?.finish();
 
                }) {
-                   Text("Click")
+                   Text("Add Task")
                }
 
            }
