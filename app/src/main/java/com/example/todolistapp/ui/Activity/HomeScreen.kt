@@ -1,14 +1,16 @@
-package com.example.todolistapp
-
+package com.example.todolistapp.ui.Activity
+import androidx.lifecycle.Observer
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -35,9 +37,13 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.todolistapp.ui.MenuItem
+import com.example.todolistapp.HomeScreenHeader
+import com.example.todolistapp.R
+import com.example.todolistapp.ui.Database.ToDoNoteItem
+import com.example.todolistapp.ui.Database.ToDoViewModel
+import com.example.todolistapp.ui.Models.MenuItem
+import com.example.todolistapp.ui.Models.Notes
 import com.example.todolistapp.ui.navigationDrawerBody
-import com.example.todolistapp.ui.navigationDrawerHeader
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,17 +51,19 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
+    val notesViewModel by viewModels<ToDoViewModel>()
+
     var filteredNoteList by mutableStateOf(
         listOf(
-            Notes("Water", "High", "Drink 2 Glasses")
+            ToDoNoteItem(0,"Water", "High", "Drink 2 Glasses")
          )
     )
     var listOfNotes by mutableStateOf(
         listOf(
-            Notes("Water", "High", "Drink 2 Glasses"),
-            Notes("Walk", "Medium", "Walk  "),
-            Notes("Take a break ", "Low", " 5 Mins break "),
-            Notes("Drink ", "High", "Drink water")
+            ToDoNoteItem(0,"Water", "High", "Drink 2 Glasses"),
+            ToDoNoteItem(0,"Walk", "Medium", "Walk  "),
+            ToDoNoteItem(0,"Take a break ", "Low", " 5 Mins break "),
+            ToDoNoteItem(0,"Drink ", "High", "Drink water")
         )
     )
     var menuItems by mutableStateOf(
@@ -70,6 +78,13 @@ class HomeScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            notesViewModel.readAllData.observe(this, Observer {note->
+                Log.d("TAG-note","$note")
+
+                filteredNoteList = filteredNoteList + note
+                listOfNotes = listOfNotes + note
+
+            })
             ToDoListAPPTheme {
                 val scaffold= rememberScaffoldState()
                 val scope= rememberCoroutineScope()
@@ -162,9 +177,9 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalMaterialApi
     @Composable
     fun searchNote(
-        listNotes: List<Notes>
-    ): MutableList<Notes> {
-        var filteredList: MutableList<Notes> = arrayListOf()
+        listNotes: List<ToDoNoteItem>
+    ): MutableList<ToDoNoteItem> {
+        var filteredList: MutableList<ToDoNoteItem> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
         OutlinedTextField(
             value = searchText,
@@ -176,7 +191,7 @@ class HomeScreen : ComponentActivity() {
         )
         for (noteItem in listNotes) {
             if (noteItem.title?.contains(searchText) == true)
-                filteredList = (filteredList + listOf(noteItem)) as MutableList<Notes>
+                filteredList = (filteredList + listOf(noteItem)) as MutableList<ToDoNoteItem>
         }
         return filteredList
     }
@@ -185,7 +200,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun displayNotes(notes: List<Notes>) {
+    fun displayNotes(notes: List<ToDoNoteItem>) {
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -287,9 +302,9 @@ class HomeScreen : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val intent = result.data
-                val newNoteDetails = intent?.getSerializableExtra("noteItem") as Notes
-                filteredNoteList = filteredNoteList + newNoteDetails
-                listOfNotes = listOfNotes + newNoteDetails
+                val newNoteDetails = intent?.getSerializableExtra("noteItem") as ToDoNoteItem
+          //      filteredNoteList = filteredNoteList + newNoteDetails
+            //    listOfNotes = listOfNotes + newNoteDetails
             }
         }
 }
