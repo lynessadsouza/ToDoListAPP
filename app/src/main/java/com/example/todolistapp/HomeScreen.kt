@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +37,12 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.todolistapp.ui.MenuItem
+import com.example.todolistapp.ui.navigationDrawerBody
+import com.example.todolistapp.ui.navigationDrawerHeader
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -53,13 +60,60 @@ class HomeScreen : ComponentActivity() {
             Notes("Drink ", "High", "Drink water")
         )
     )
+    var menuItems by mutableStateOf(
+        listOf(
+            MenuItem("home", "Home", "Go To Home Screen", Icons.Default.Home),
+            MenuItem("deletedNotes", "Deleted Notes", "My Deleted Notes", Icons.Default.Delete),
+            MenuItem("settings", "Settings", "Go To Home Screen  ",Icons.Default.Settings)
+           )
+    )
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                ListPreviousNotes()
+                val scafoldState= rememberScaffoldState()
+                val scope= rememberCoroutineScope()
+                var textstate by remember { mutableStateOf("home")}
+                Scaffold(
+                    scaffoldState = scafoldState,
+                    topBar = {
+                           com.example.todolistapp.ui.AppBar(
+                                 onNavigationIconClick = {
+                                     scope.launch {
+                                         scafoldState.drawerState.open()
+                                     }
+
+                                 }
+
+                             )
+                    },
+                    drawerContent = {
+                       // navigationDrawerHeader()
+                        HomeScreenHeader()
+                        navigationDrawerBody(
+                            menuItem = menuItems ,
+                            onItemClick ={
+                                when(it.id){
+                                    "home"-> {textstate="home"
+                                }
+
+                                println("clicked ${it.title}")
+                            },
+
+                        )
+                    }
+
+                ) {
+                  //  Log.d("textstate", textstate)
+                    if(textstate=="home"){
+                        Log.d("textstate", textstate)
+                        ListPreviousNotes()
+                    }
+                    
+                }
+              //  ListPreviousNotes()
             }
         }
     }
@@ -76,7 +130,7 @@ class HomeScreen : ComponentActivity() {
                 .shadow(1.dp)
 
         ) {
-            HomeScreenHeader()
+           // HomeScreenHeader()
             Row(
                 Modifier
                     .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
