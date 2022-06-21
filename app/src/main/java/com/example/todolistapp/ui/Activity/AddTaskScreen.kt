@@ -89,7 +89,6 @@ fun AddTask(model: ToDoViewModel) {
                     value = title,
                     onValueChange = {
                         title = it
-                        Log.d("title", title)
                     },
                     Modifier.padding(bottom = 10.dp),
                     label = { Text(text = "Title") },
@@ -134,7 +133,6 @@ fun AddTask(model: ToDoViewModel) {
                     value = description,
                     onValueChange = {
                         description = it
-                        Log.d("description", description)
 
                     },
                     Modifier.padding(top = 10.dp),

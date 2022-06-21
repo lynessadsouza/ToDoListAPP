@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.ui.graphics.BlendMode
 import com.example.todolistapp.HomeScreenHeader
 import com.example.todolistapp.R
 import com.example.todolistapp.ui.Database.ToDoNoteItem
@@ -52,20 +53,19 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
+    private var filteredNoteList = emptyList<ToDoNoteItem>()
+
     val notesViewModel by viewModels<ToDoViewModel>()
 
-    var filteredNoteList by mutableStateOf(
+ /*   var filteredNoteList by mutableStateOf(
         listOf(
             ToDoNoteItem(0,"Water", "High", "Drink 2 Glasses")
          )
-    )
+    )*/
     var listOfNotes by mutableStateOf(
         listOf(
-            ToDoNoteItem(0,"Water", "High", "Drink 2 Glasses"),
-            ToDoNoteItem(0,"Walk", "Medium", "Walk  "),
-            ToDoNoteItem(0,"Take a break ", "Low", " 5 Mins break "),
-            ToDoNoteItem(0,"Drink ", "High", "Drink water")
-        )
+            ToDoNoteItem(0,"Water", "High", "Drink 2 Glasses")
+            )
     )
     var menuItems by mutableStateOf(
         listOf(
@@ -81,11 +81,15 @@ class HomeScreen : ComponentActivity() {
         setContent {
             notesViewModel.readAllData.observe(this, Observer {note->
                 Log.d("TAG-note","$note")
+                filteredNoteList=note
+                Log.d("userList","$filteredNoteList")
 
-                filteredNoteList = filteredNoteList + note
-                listOfNotes = listOfNotes + note
+            //    filteredNoteList = filteredNoteList + note
+                Log.d("filteredNoteList","$filteredNoteList")
+                listOfNotes =  note
 
             })
+            displayNotes(notes = filteredNoteList, model =notesViewModel )
             ToDoListAPPTheme {
                 val scaffold= rememberScaffoldState()
                 val scope= rememberCoroutineScope()
@@ -169,7 +173,7 @@ class HomeScreen : ComponentActivity() {
                 text = "My ToDo Notes", fontWeight = FontWeight.Bold, modifier = Modifier
                     .padding(start = 20.dp, bottom = 10.dp)
             )
-            displayNotes(filteredNoteList)
+            displayNotes(filteredNoteList, notesViewModel)
         }
     }
 
@@ -201,7 +205,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun displayNotes(notes: List<ToDoNoteItem>) {
+    fun displayNotes(notes: List<ToDoNoteItem>, model: ToDoViewModel) {
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -293,8 +297,24 @@ class HomeScreen : ComponentActivity() {
 
                         }
                         Image(
-                            modifier=Modifier.padding(end = 10.dp).clickable(
-                                    onClick = { }
+                            modifier= Modifier
+                                .padding(end = 10.dp)
+                                .clickable(
+                                    onClick = {
+                                        notes[index].title
+                                        Log.d("tag", notes[index].id.toString())
+
+                                        var note = ToDoNoteItem(
+                                            notes[index].id,
+                                            "${notes[index].title}",
+                                            "${notes[index].priority}",
+                                            "${notes[index].description}"
+                                        )
+
+                                        model.deleteUser(note)
+
+
+                                    }
                                 ),
                             painter = painterResource(R.drawable.ic_delete),
                             contentDescription = "",
