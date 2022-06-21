@@ -153,7 +153,6 @@ fun AddTask(model: ToDoViewModel) {
                         val notes = ToDoNoteItem(0, title, selectedPriority, description)
                         model.addNote(notes)
                         Log.d("description", "Note added")
-
                         val intent = Intent()
                         intent.putExtra("noteItem", notes)
                         getActivity(context)?.setResult(Activity.RESULT_OK, intent);

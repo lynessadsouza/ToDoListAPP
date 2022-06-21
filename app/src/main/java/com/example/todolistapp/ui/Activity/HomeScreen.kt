@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -260,7 +261,7 @@ class HomeScreen : ComponentActivity() {
                         Column(
 
                             Modifier
-                                .width(290.dp)
+                                .width(250.dp)
                                 .padding(start = 10.dp)
 
                         ){
@@ -291,6 +292,14 @@ class HomeScreen : ComponentActivity() {
                             }
 
                         }
+                        Image(
+                            modifier=Modifier.padding(end = 10.dp).clickable(
+                                    onClick = { }
+                                ),
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = "",
+                            colorFilter =   ColorFilter.tint(Color.Black)
+                        )
                         Checkbox(checked, onCheckedChange)
                     }
                 }
