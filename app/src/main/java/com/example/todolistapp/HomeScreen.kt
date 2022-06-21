@@ -1,5 +1,6 @@
 package com.example.todolistapp
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,8 @@ import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -15,65 +18,110 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.todolistapp.ui.MenuItem
+import com.example.todolistapp.ui.navigationDrawerBody
+import com.example.todolistapp.ui.navigationDrawerHeader
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
-import androidx.core.app.ActivityCompat.startActivityForResult
-import android.R.id
-import android.app.Activity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-
+import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
-    var title: String? = null
-    var priority: String? = null
-    var description: String? = null
+    var filteredNoteList by mutableStateOf(
+        listOf(
+            Notes("Water", "High", "Drink 2 Glasses")
+         )
+    )
+    var listOfNotes by mutableStateOf(
+        listOf(
+            Notes("Water", "High", "Drink 2 Glasses"),
+            Notes("Walk", "Medium", "Walk  "),
+            Notes("Take a break ", "Low", " 5 Mins break "),
+            Notes("Drink ", "High", "Drink water")
+        )
+    )
+    var menuItems by mutableStateOf(
+        listOf(
+            MenuItem("home", "Home", "Go To Home Screen", Icons.Default.Home),
+            MenuItem("deletedNotes", "Deleted Notes", "My Deleted Notes", Icons.Default.Delete),
+            MenuItem("settings", "Settings", "Go To Home Screen  ",Icons.Default.Settings)
+           )
+    )
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
+                val scafoldState= rememberScaffoldState()
+                val scope= rememberCoroutineScope()
+                var textstate by remember { mutableStateOf("home")}
+                Scaffold(
+                    scaffoldState = scafoldState,
+                    topBar = {
+                           com.example.todolistapp.ui.AppBar(
+                                 onNavigationIconClick = {
+                                     scope.launch {
+                                         scafoldState.drawerState.open()
+                                     }
 
-                ListPreviousNotes()
-                //Log.d("TAG", "setContent")
-                //ShowData()
+                                 }
+
+                             )
+                    },
+                    drawerContent = {
+                       // navigationDrawerHeader()
+                        HomeScreenHeader()
+                        navigationDrawerBody(
+                            menuItem = menuItems ,
+                            onItemClick ={
+                                when(it.id){
+                                    "home"-> {textstate="home"
+                                }
+
+                                println("clicked ${it.title}")
+                            },
+
+                        )
+                    }
+
+                ) {
+                  //  Log.d("textstate", textstate)
+                    if(textstate=="home"){
+                        Log.d("textstate", textstate)
+                        ListPreviousNotes()
+                    }
+                    
+                }
+              //  ListPreviousNotes()
             }
         }
-    }
-
-    @Composable
-    fun ShowData() {
-
-        val context = LocalContext.current
-        val intent = (context as HomeScreen).intent
-        title = intent.getStringExtra("title")
-        priority = intent.getStringExtra("priority")
-        description = intent.getStringExtra("description")
-
-        Log.d("HomeScreen", "$title, $priority , $description")
-        val note = Notes(title, priority, description)
-
-
     }
 
     @ExperimentalMaterialApi
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ListPreviousNotes() {
-        var isButtonVisible by remember { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,42 +130,14 @@ class HomeScreen : ComponentActivity() {
                 .shadow(1.dp)
 
         ) {
-            HomeScreenHeader()
-
-
-
-            var noteListState by remember {
-                mutableStateOf(
-                    listOf(
-                        Notes("hey", "High", "Drink 2 Glasses"),
-                        Notes(" water", "High", "Drink 2 Glasses"),
-                        Notes("Drink ", "High", "Drink 2 Glasses"),
-                        Notes("Drink ", "High", "Drink 2 Glasses")
-
-                    )   )
-            }
-            var noteListNewCopy by remember {
-                mutableStateOf(
-                    listOf(
-                        Notes("hey", "High", "Drink 2 Glasses"),
-                        Notes(" water", "High", "Drink 2 Glasses"),
-                        Notes("Drink ", "High", "Drink 2 Glasses"),
-                        Notes("Drink ", "High", "Drink 2 Glasses")
-
-                    )
-                )
-            }
-
-
-
-
+           // HomeScreenHeader()
             Row(
                 Modifier
                     .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             ) {
                 val context = LocalContext.current
-                val list = searchNote(noteListNewCopy)
+                val list = searchNote(listOfNotes)
                 FloatingActionButton(
                     modifier = Modifier
                         .size(60.dp)
@@ -125,15 +145,8 @@ class HomeScreen : ComponentActivity() {
                         .padding(15.dp),
                     shape = CircleShape,
                     onClick = {
-
-
                         val intent = Intent(context, AddTaskScreen::class.java)
                         startForResult.launch(intent)
-
-                      //  context.startActivity(Intent(context, AddTaskScreen::class.java))
-                        isButtonVisible = "true"
-
-                        Log.d("TAG", isButtonVisible)
                     },
                 ) {
                     Icon(
@@ -141,16 +154,11 @@ class HomeScreen : ComponentActivity() {
                         contentDescription = null // decorative element
                     )
                 }
-                if (isButtonVisible == "true") {
-                    Log.d("TAG", isButtonVisible)
-                } else {
-                    Log.d("TAG", "Dont do anything ")
 
-                }
                 if (list.isNotEmpty()) {
-                    noteListState = list
+                    filteredNoteList = list
                 } else if (list.isEmpty()) {
-                    (noteListState as MutableList<String>).clear()
+                    (filteredNoteList as MutableList<String>).clear()
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
@@ -159,10 +167,9 @@ class HomeScreen : ComponentActivity() {
                     .padding(start = 20.dp, bottom = 10.dp)
 
             )
-            DisplayNotesList(noteListState)
+            displayNotes(filteredNoteList)
         }
     }
-
 
     @OptIn(ExperimentalAnimationApi::class)
     @ExperimentalAnimationApi
@@ -170,7 +177,7 @@ class HomeScreen : ComponentActivity() {
     @Composable
     fun searchNote(
         listNotes: List<Notes>
-    ): List<Notes> {
+    ): MutableList<Notes> {
         var filteredList: MutableList<Notes> = arrayListOf()
         var searchText by remember { mutableStateOf("") }
         OutlinedTextField(
@@ -184,7 +191,7 @@ class HomeScreen : ComponentActivity() {
         for (noteItem in listNotes) {
 
             if (noteItem.title?.contains(searchText) == true)
-           filteredList = (filteredList + listOf(noteItem)) as MutableList<Notes>
+                filteredList = (filteredList + listOf(noteItem)) as MutableList<Notes>
         }
 
 
@@ -196,7 +203,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun DisplayNotesList(notes: List<Notes>) {
+    fun displayNotes(notes: List<Notes>) {
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -224,32 +231,68 @@ class HomeScreen : ComponentActivity() {
                         )
                         .shadow(1.dp)
                         .fillMaxWidth()
-                        .background(Color.Blue),
+                        .background(Color.White),
                     shape = RoundedCornerShape(8.dp),
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(start = 10.dp, top = 1.dp, bottom = 1.dp, end = 10.dp)
+                            .padding(top = 1.dp, bottom = 1.dp, end = 10.dp)
                             .background(Color.White)
-                            .clickable {}
                             .horizontalScroll(listState),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
 
                     ) {
+
                         val (checked, onCheckedChange) = remember { mutableStateOf(false) }
+                        Image(
+                            painter = painterResource(R.drawable.priority),
+                            contentDescription = "",
+                            colorFilter =
+                            if(notes[index].priority.equals("High")){
+                                ColorFilter.tint(Color.Red)
+                            }
+                            else if (notes[index].priority.equals("Medium")){
+                                ColorFilter.tint(Color.Yellow)
+                            }
+                            else
+                            {
+                                ColorFilter.tint(Color.Green)
+                            }
+                        )
+                        Column(
 
+                            Modifier
+                                .width(290.dp)
+                                .padding(start = 10.dp)
 
-                        notes[index].title?.let {
-                            Text(
-                                text = it,
-                                color = if (checked) {
-                                    Color.Blue
-                                } else {
-                                    Color.Black
-                                }
-                            )
+                        ){
+                            notes[index].title?.let {
+                                Text(
+                                    textAlign = TextAlign.Start,
+                                    fontWeight=Bold,
+                                    modifier= Modifier.padding(bottom = 5.dp),
+                                    text = it,
+                                    color = if (checked) {
+                                        Color.Blue
+                                    } else {
+                                        Color.Black
+                                    }
+                                )
+                            }
+                            notes[index].description?.let {
+                                Text(
+                                    fontSize = 13.sp,
+                                    text = it,
+                                    color = if (checked) {
+                                        Color.Blue
+                                    } else {
+                                        Color.Black
+                                    }
+
+                                )
+                            }
+
                         }
                         Checkbox(checked, onCheckedChange)
                     }
@@ -258,90 +301,14 @@ class HomeScreen : ComponentActivity() {
         }
     }
 
-    //onNewNoteAdded - like a listnr which will update
-    @OptIn(ExperimentalAnimationApi::class)
-    @Composable
-    fun AddNewNote(onNewNoteAdded: (String) -> Unit) {
-        val scale = remember { androidx.compose.animation.core.Animatable(0f) }
-        val openDialog = remember { mutableStateOf(true) }
-        var text by remember { mutableStateOf("") }
-
-        LaunchedEffect(key1 = true) {
-            scale.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(
-                    durationMillis = 500,
-                    easing = {
-                        OvershootInterpolator(2f).getInterpolation(it)
-                    }
-                )
-            )
-            delay(3000L)
+    val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                val newNoteDetails = intent?.getSerializableExtra("noteItem") as Notes
+                filteredNoteList = filteredNoteList + newNoteDetails
+                listOfNotes = listOfNotes + newNoteDetails
+            }
         }
-
-
-        if (openDialog.value) {
-            AlertDialog(
-                modifier = Modifier.scale(scale.value),
-                onDismissRequest = {
-                    openDialog.value = false
-                },
-                title = {
-                    Text(
-                        text = "Add Note Description"
-                    )
-                },
-                text = {
-                    Column() {
-                        TextField(
-                            value = text,
-                            onValueChange = { text = it }
-                        )
-                        Text("Note description")
-                    }
-                },
-                buttons = {
-                    Row(
-                        modifier = Modifier.padding(all = 8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        val addNoteButtonState by remember { mutableStateOf(false) }
-                        if (addNoteButtonState) {
-                            onNewNoteAdded(text)
-                        } else {
-                            Box(contentAlignment = Alignment.Center) {
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = {
-                                        if (text != "") {
-                                            onNewNoteAdded(text)
-                                        }
-                                        //  addNoteButtonState = true
-
-                                        openDialog.value = false
-                                    }
-                                ) {
-                                    Text(
-                                        "Add Note To The List",
-                                    )
-                                }
-                            }
-                        }
-                    }
-                },
-            )
-        }
-    }
-    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data
-
-           val note = intent?.getSerializableExtra("noteItem") as? Notes
-            Log.d("TAG-intent","$note")
-
-        }
-    }
-
 }
 

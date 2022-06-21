@@ -62,8 +62,6 @@ fun GreetingSection(
 
     ) {
         val visible by remember { mutableStateOf(true) }
-
-        val context = LocalContext.current
         Column(
             Modifier.padding(10.dp),
             verticalArrangement = Arrangement.Center
@@ -75,15 +73,10 @@ fun GreetingSection(
                 exit = fadeOut()+ shrinkHorizontally ()
 
            ) {
-                // heading text view
                 Text(
                     text = "Good Day, $name",
                     style = MaterialTheme.typography.h5
                 )
-                /*Text(
-                    text = "We wish you have a good day!",
-                    style = MaterialTheme.typography.body1
-                )*/
            }
         }
     }

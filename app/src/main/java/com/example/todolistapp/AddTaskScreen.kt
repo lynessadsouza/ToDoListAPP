@@ -1,10 +1,10 @@
 package com.example.todolistapp
-
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -49,101 +49,101 @@ class AddTaskScreen : ComponentActivity() {
 @Composable
 fun AddTask() {
     var title by remember { mutableStateOf("") }
-    var description  by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
     val priority = listOf("High", "Medium", "Low")
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(priority[0]) }
+    var selectedPriority by remember { mutableStateOf(priority[1]) }
 
+    Box(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxSize()
+            .shadow(2.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column() {
+            val context = LocalContext.current
+            Text(
+                text = "Add Your Note Details Here ",
+                fontWeight = FontWeight.Black, modifier = Modifier.padding(bottom = 20.dp)
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = {
+                        title = it
+                        Log.d("title", title)
+                    },
+                    Modifier.padding(bottom = 10.dp),
+                    label = { Text(text = "Title") },
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = {
+                        expanded = !expanded
+                    }
+                ) {
+                    TextField(
+                        readOnly = true,
+                        value = selectedPriority,
+                        onValueChange = { },
+                        label = { Text("Priority") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded
+                            )
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = {
+                            expanded = false
+                        }
+                    ) {
+                        priority.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedPriority = selectionOption
+                                    expanded = false
+                                }
+                            ) {
+                                Text(text = selectionOption)
+                            }
+                        }
+                    }
+                }
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = {
+                        description = it
+                        Log.d("description", description)
 
-      Box(
-         modifier = Modifier
-             .padding(12.dp)
-             .fillMaxSize()
-             .shadow(2.dp)
-             .clip(RoundedCornerShape(12.dp))
-             .background(Color.White)
-             .padding(12.dp),
-    contentAlignment = Alignment.Center
-      ){
-       Column() {
-           val context = LocalContext.current
-
-           Text(text = "Add Your Note Details Here ", fontWeight = FontWeight.Black)
-           Column() {
-               OutlinedTextField(
-                   value = title,
-                   onValueChange = {
-                       title = it
-                       Log.d("title", title)
-                   },
-                   Modifier.padding(bottom = 10.dp),
-                   label = { Text(text = "Title") },
-               )
-               ExposedDropdownMenuBox(
-                   expanded = expanded,
-                   onExpandedChange = {
-                       expanded = !expanded
-                   }
-               ) {
-                   TextField(
-                       readOnly = true,
-                       value = selectedOptionText,
-                       onValueChange = { },
-                       label = { Text("Priority") },
-                       trailingIcon = {
-                           ExposedDropdownMenuDefaults.TrailingIcon(
-                               expanded = expanded
-                           )
-                       },
-                       colors = ExposedDropdownMenuDefaults.textFieldColors()
-                   )
-                   ExposedDropdownMenu(
-                       expanded = expanded,
-                       onDismissRequest = {
-                           expanded = false
-                       }
-                   ) {
-                       priority.forEach { selectionOption ->
-                           DropdownMenuItem(
-                               onClick = {
-                                   selectedOptionText = selectionOption
-                                   Log.d("selectedOptionText", selectedOptionText)
-                                   expanded = false
-                               }
-                           ) {
-                               Text(text = selectionOption)
-                           }
-                       }
-                   }
-               }
-               OutlinedTextField(
-                   value = description,
-                   onValueChange = {
-                       description = it
-                       Log.d("description", description)
-
-                   },
-                   Modifier.padding(top = 10.dp),
-                   label = { Text(text = "Description") },
-               )
-               Button(onClick = {
-
-                 //  setResult(Activity.Result_OK, yourIntentResult)
-                   val intent = Intent()
-                   var note=Notes(title, selectedOptionText, description)
-                //   setResult(123,intent)
-                   intent.putExtra("noteItem", note)
-                   getActivity(context)?.setResult(Activity.RESULT_OK, intent);
-                   getActivity(context)?.finish();
-
-               }) {
-                   Text("Click")
-               }
-
-           }
-       }
-
-
-
-          }
+                    },
+                    Modifier.padding(top = 10.dp),
+                    label = { Text(text = "Description") },
+                )
+                Button(onClick = {
+                    if (title == "" || description == ""){
+                        Toast.makeText(context, "Please fill out all the details ", Toast.LENGTH_LONG).show()
+                    }
+                    else
+                    {
+                        val intent = Intent()
+                        val note = Notes(title, selectedPriority, description)
+                        intent.putExtra("noteItem", note)
+                        getActivity(context)?.setResult(Activity.RESULT_OK, intent);
+                        getActivity(context)?.finish();
+                    }
+                }) {
+                    Text("Add Task")
+                }
+            }
+        }
+    }
 }
