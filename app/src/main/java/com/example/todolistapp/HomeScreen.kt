@@ -73,16 +73,16 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                val scafoldState= rememberScaffoldState()
+                val scaffold= rememberScaffoldState()
                 val scope= rememberCoroutineScope()
                 var textstate by remember { mutableStateOf("home")}
                 Scaffold(
-                    scaffoldState = scafoldState,
+                    scaffoldState = scaffold,
                     topBar = {
                            com.example.todolistapp.ui.AppBar(
                                  onNavigationIconClick = {
                                      scope.launch {
-                                         scafoldState.drawerState.open()
+                                         scaffold.drawerState.open()
                                      }
 
                                  }
@@ -90,30 +90,23 @@ class HomeScreen : ComponentActivity() {
                              )
                     },
                     drawerContent = {
-                       // navigationDrawerHeader()
+                        // navigationDrawerHeader()
                         HomeScreenHeader()
                         navigationDrawerBody(
-                            menuItem = menuItems ,
-                            onItemClick ={
-                                when(it.id){
-                                    "home"-> {textstate="home"
+                            menuItem = menuItems,
+                            onItemClick = {
+                                when (it.id) {
+                                    "home" -> textstate = "home"
                                 }
-
-                                println("clicked ${it.title}")
-                            },
-
+                            }
                         )
                     }
 
                 ) {
-                  //  Log.d("textstate", textstate)
                     if(textstate=="home"){
-                        Log.d("textstate", textstate)
                         ListPreviousNotes()
                     }
-                    
                 }
-              //  ListPreviousNotes()
             }
         }
     }
@@ -130,7 +123,6 @@ class HomeScreen : ComponentActivity() {
                 .shadow(1.dp)
 
         ) {
-           // HomeScreenHeader()
             Row(
                 Modifier
                     .padding(start = 5.dp, bottom = 5.dp, top = 5.dp, end = 10.dp)
