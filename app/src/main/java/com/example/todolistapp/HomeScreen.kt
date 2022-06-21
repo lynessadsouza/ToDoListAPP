@@ -3,7 +3,6 @@ package com.example.todolistapp
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -19,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -84,9 +82,7 @@ class HomeScreen : ComponentActivity() {
                                      scope.launch {
                                          scaffold.drawerState.open()
                                      }
-
                                  }
-
                              )
                     },
                     drawerContent = {
@@ -101,7 +97,6 @@ class HomeScreen : ComponentActivity() {
                             }
                         )
                     }
-
                 ) {
                     if(textstate=="home"){
                         ListPreviousNotes()
@@ -157,7 +152,6 @@ class HomeScreen : ComponentActivity() {
             Text(
                 text = "My ToDo Notes", fontWeight = FontWeight.Bold, modifier = Modifier
                     .padding(start = 20.dp, bottom = 10.dp)
-
             )
             displayNotes(filteredNoteList)
         }
@@ -181,13 +175,9 @@ class HomeScreen : ComponentActivity() {
             label = { Text(text = "Search Keyword Here") },
         )
         for (noteItem in listNotes) {
-
             if (noteItem.title?.contains(searchText) == true)
                 filteredList = (filteredList + listOf(noteItem)) as MutableList<Notes>
         }
-
-
-
         return filteredList
     }
 
