@@ -5,7 +5,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -43,24 +42,5 @@ class ToDoViewModel(application: Application) : AndroidViewModel(application) {
             repository.deleteNote(notes = noteItem)
         }
     }
-    fun deleteAllUsers() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteAllNotes()
-        }
-    }
-
-
-
-    fun readData(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            //    repository.readData(name)
-        }
-    }
-
 
 }
-
-//viewModelScope is attached to every instance of ViewModel.
-// It runs out when the ViewModel is destroyed.
-
-//Dispatchers help coroutines in deciding the thread on which the work has to be done

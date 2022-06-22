@@ -1,10 +1,8 @@
 package com.example.todolistapp.ui.Activity
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,22 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.todolistapp.ui.Database.ToDoNoteItem
 import com.example.todolistapp.ui.Database.ToDoViewModel
-import com.example.todolistapp.ui.Models.Notes
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
-import com.google.android.material.internal.ContextUtils.getActivity
 
 class AddTaskScreen() : ComponentActivity() {
-    val notesViewModel by viewModels<ToDoViewModel>()
+    private val notesViewModel by viewModels<ToDoViewModel>()
 
     @OptIn(ExperimentalAnimationApi::class)
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             ToDoListAPPTheme {
-
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     AddTask(notesViewModel)
                 }
@@ -143,15 +136,11 @@ fun AddTask(model: ToDoViewModel) {
                             Toast.LENGTH_LONG
                         ).show()
                     } else {
-                       // val note = Notes(0,title, selectedPriority, description)
-
                         val notes = ToDoNoteItem(0, title, selectedPriority, description)
                         model.addNote(notes)
-                        Log.d("description", "Note added")
-                        val intent = Intent()
-                        intent.putExtra("noteItem", notes)
-                        getActivity(context)?.setResult(Activity.RESULT_OK, intent);
-                        getActivity(context)?.finish();
+                        Toast.makeText(context, "Note added successfully!", Toast.LENGTH_LONG)
+                            .show()
+                        context.startActivity(Intent(context, HomeScreen::class.java))
                     }
                 }) {
                     Text("Add Task")

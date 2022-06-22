@@ -12,7 +12,6 @@ fun AppBar(
     onNavigationIconClick: () -> Unit
 ) {
     TopAppBar(
-
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = MaterialTheme.colors.onPrimary,
         title = {
