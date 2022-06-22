@@ -6,6 +6,13 @@ import com.example.todolistapp.ui.Models.Notes
 @Dao
 interface ToDoNoteDatabaseDao {
 
+    @Query("SELECT * FROM deleted_note_table ")//where firstName= :name ")
+    fun readdeletedAllData(): LiveData<List<ToDoNoteItemDeletedNote>>
+
+    @Insert
+    suspend fun insertDeletedNotes(notes: ToDoNoteItemDeletedNote)
+
+
 
     @Query("SELECT * FROM note_table ")//where firstName= :name ")
     fun readAllData(): LiveData<List<ToDoNoteItem>>

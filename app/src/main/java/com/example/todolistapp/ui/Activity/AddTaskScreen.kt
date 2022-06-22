@@ -63,9 +63,6 @@ fun AddTask(model: ToDoViewModel) {
     var expanded by remember { mutableStateOf(false) }
     var selectedPriority by remember { mutableStateOf(priority[1]) }
 
-
-
-
     Box(
         modifier = Modifier
             .padding(12.dp)

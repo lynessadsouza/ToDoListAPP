@@ -13,15 +13,24 @@ class ToDoViewModel(application: Application) : AndroidViewModel(application) {
     val readAllData: LiveData<List<ToDoNoteItem>>
     private val repository: ToDoNoteRepository
 
+    val readDeletedData: LiveData<List<ToDoNoteItemDeletedNote>>
+
+
     init {
         val userDao = ToDoDatabase.getDatabase(application).noteDao()
         repository = ToDoNoteRepository(userDao)
         readAllData = repository.readAllData
+        readDeletedData=repository.readDeletedData
+    }
+
+    fun addDeletedNote(noteItem: ToDoNoteItemDeletedNote) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addDeletedNote(noteItem)
+        }
+
     }
 
     fun addNote(noteItem: ToDoNoteItem) {
-
-
         viewModelScope.launch(Dispatchers.IO) {
             repository.addNote(noteItem)
         }

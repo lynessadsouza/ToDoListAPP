@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoListAPP">
         <activity
+            android:name=".ui.Activity.DeletedNotesScreen"
+            android:exported="false"
+            android:label="@string/title_activity_deleted_notes_screen"
+            android:theme="@style/Theme.ToDoListAPP.NoActionBar" />
+        <activity
             android:name=".ui.Activity.AddTaskScreen"
             android:exported="false"
             android:label="@string/title_activity_add_task"

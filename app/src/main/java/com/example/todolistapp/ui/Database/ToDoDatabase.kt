@@ -7,7 +7,8 @@ import androidx.room.RoomDatabase
 import com.example.todolistapp.ui.Models.Notes
 
 
-@Database(entities = [ToDoNoteItem::class], version = 1, exportSchema = false )
+@Database(entities = [ToDoNoteItem::class, ToDoNoteItemDeletedNote::class],
+    version = 1, exportSchema = false )
 
 abstract class ToDoDatabase: RoomDatabase()
 {
@@ -27,7 +28,7 @@ abstract class ToDoDatabase: RoomDatabase()
                 val instance= Room.databaseBuilder(
                     context.applicationContext,
                     ToDoDatabase::class.java,
-                    "user_database"
+                    "note_database"
                 ).build()
                 INSTANCE=instance
                 return instance
