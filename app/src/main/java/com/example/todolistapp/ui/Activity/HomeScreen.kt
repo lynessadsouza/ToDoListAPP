@@ -65,7 +65,7 @@ class HomeScreen : ComponentActivity() {
     var menuItems by mutableStateOf(
         listOf(
             MenuItem("home", "Home", "Go To Home Screen", Icons.Default.Home),
-            MenuItem("deletedNotes", "Deleted Notes", "My Deleted Notes", Icons.Default.Delete),
+            MenuItem("deletedNotes", "Trash", "My Deleted Notes", Icons.Default.Delete),
             MenuItem("settings", "Settings", "Go To Home Screen  ", Icons.Default.Settings)
         )
     )
@@ -77,7 +77,7 @@ class HomeScreen : ComponentActivity() {
             notesViewModel.readAllData.observe(this, Observer { note ->
                 filteredNoteList = note
                 listOfNotes = note
-               
+
 
             })
 
