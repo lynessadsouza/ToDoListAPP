@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -75,12 +76,15 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             notesViewModel.readAllData.observe(this, Observer { note ->
+                if (note.isEmpty())
+                {
+                    Log.d("tag","no notes found ")
+                  Toast.makeText(this, "Please enter  notes to proceed ", Toast.LENGTH_LONG).show()
+                }
                 filteredNoteList = note
                 listOfNotes = note
-
-
             })
-
+            displayNotes(notes = filteredNoteList, model =notesViewModel )
             notesViewModel.readDeletedData.observe(this, Observer { note ->
                 deletedNotes = note
             })
@@ -123,6 +127,11 @@ class HomeScreen : ComponentActivity() {
                 }
             }
         }
+    }
+
+    @Composable
+    fun noNotesFound() {
+        Text(text = "No Notes Found")
     }
 
     @ExperimentalMaterialApi
