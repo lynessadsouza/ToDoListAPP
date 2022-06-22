@@ -54,7 +54,6 @@ import kotlinx.coroutines.launch
 class HomeScreen : ComponentActivity() {
     private var filteredNoteList = emptyList<ToDoNoteItem>()
     private var deletedNotes = emptyList<ToDoNoteItemDeletedNote>()
- //private var listOfNotes = emptyList<ToDoNoteItem>()
 
     val notesViewModel by viewModels<ToDoViewModel>()
 
@@ -89,7 +88,6 @@ class HomeScreen : ComponentActivity() {
                 deletedNotes = note
             })
 
-            displayNotes(notes = filteredNoteList, model = notesViewModel)
             ToDoListAPPTheme {
                 val scaffold = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
@@ -112,8 +110,17 @@ class HomeScreen : ComponentActivity() {
                             menuItem = menuItems,
                             onItemClick = {
                                 when (it.id) {
-                                    "home" -> textstate = "home"
-                                    "deletedNotes" -> textstate = "deletedNotes"
+                                    "home" -> {textstate = "home"
+                                        scope.launch {
+                                            scaffold.drawerState.close()
+                                        }
+                                    }
+                                    "deletedNotes" ->{
+                                        textstate = "deletedNotes"
+                                        scope.launch {
+                                            scaffold.drawerState.close()
+                                        }
+                                    }
                                 }
                             }
                         )
@@ -166,7 +173,7 @@ class HomeScreen : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_add_24),
-                        contentDescription = null // decorative element
+                        contentDescription = null
                     )
                 }
 
@@ -174,7 +181,6 @@ class HomeScreen : ComponentActivity() {
                     filteredNoteList = list
                 } else if (list.isEmpty()) {
                     filteredNoteList=list
-                    //    (filteredNoteList as MutableList<String>).clear()
                     Toast.makeText(context, "Note not found ", Toast.LENGTH_LONG).show()
                 }
             }
@@ -223,7 +229,7 @@ class HomeScreen : ComponentActivity() {
                 animationSpec = tween(
                     durationMillis = 500,
                     easing = { animation ->
-                        OvershootInterpolator(2f).getInterpolation(animation)
+                        OvershootInterpolator(7f).getInterpolation(animation)
                     }
                 )
             )
@@ -332,7 +338,11 @@ class HomeScreen : ComponentActivity() {
                             contentDescription = "",
                             colorFilter = ColorFilter.tint(Color.Black)
                         )
+
                         Checkbox(checked, onCheckedChange)
+                        if(onCheckedChange.equals("true")){
+                            Log.d("onCheckedChange", notes[index].id.toString())
+                        }
                     }
                 }
             }
