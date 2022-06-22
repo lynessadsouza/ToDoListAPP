@@ -20,6 +20,8 @@ interface ToDoNoteDatabaseDao {
 
     @Delete
     suspend fun deleteNotes(notes: ToDoNoteItem)
+    @Update
+    suspend fun updateUser(notes: ToDoNoteItem)
 
 
 

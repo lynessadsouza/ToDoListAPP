@@ -14,7 +14,8 @@ data class ToDoNoteItem(
     @ColumnInfo(name = "note_priority")
     val priority: String?,
     @ColumnInfo(name = "note_description")
-    val description: String?
-):Serializable
-{}
+    val description: String?,
+    @ColumnInfo(name = "note_status")
+    val noteStatus: Boolean?
+) : Serializable {}
 

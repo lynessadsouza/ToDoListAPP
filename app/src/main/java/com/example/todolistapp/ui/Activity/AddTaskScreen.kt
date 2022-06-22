@@ -136,7 +136,7 @@ fun AddTask(model: ToDoViewModel) {
                             Toast.LENGTH_LONG
                         ).show()
                     } else {
-                        val notes = ToDoNoteItem(0, title, selectedPriority, description)
+                        val notes = ToDoNoteItem(0, title, selectedPriority, description, false)
                         model.addNote(notes)
                         Toast.makeText(context, "Note added successfully!", Toast.LENGTH_LONG)
                             .show()

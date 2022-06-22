@@ -37,10 +37,17 @@ class ToDoViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun deleteUser(noteItem: ToDoNoteItem) {
+    fun deleteNote(noteItem: ToDoNoteItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteNote(notes = noteItem)
         }
+    }
+
+    fun updateNote(noteItem: ToDoNoteItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateUser(notes = noteItem)
+        }
+
     }
 
 }

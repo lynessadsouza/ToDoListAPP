@@ -53,7 +53,7 @@ class HomeScreen : ComponentActivity() {
     private val notesViewModel by viewModels<ToDoViewModel>()
     private var listOfNotes by mutableStateOf(
         listOf(
-            ToDoNoteItem(0, "Water", "High", "Drink 2 Glasses")
+            ToDoNoteItem(0, "Water", "High", "Drink 2 Glasses", false)
         )
     )
     var menuItems by mutableStateOf(
@@ -69,12 +69,19 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             notesViewModel.readAllData.observe(this, Observer { note ->
+
                 if (note.isEmpty()) {
                     Log.d("tag", "no notes found ")
                     Toast.makeText(this, "Please enter  notes to proceed ", Toast.LENGTH_LONG)
                         .show()
                 }
+
+
+
                 filteredNoteList = note
+                Log.d("filteredNoteList", "$filteredNoteList ")
+
+
                 listOfNotes = note
             })
             displayNotes(notes = filteredNoteList, model = notesViewModel)
@@ -265,7 +272,6 @@ class HomeScreen : ComponentActivity() {
                             }
                         )
                         Column(
-
                             Modifier
                                 .width(250.dp)
                                 .padding(start = 10.dp)
@@ -307,8 +313,12 @@ class HomeScreen : ComponentActivity() {
                                             notes[index].id,
                                             "${notes[index].title}",
                                             "${notes[index].priority}",
-                                            "${notes[index].description}"
+                                            "${notes[index].description}",
+                                            true
                                         )
+                                        model.updateNote(note)
+
+
                                         val noteItem = ToDoNoteItemDeletedNote(
                                             notes[index].id,
                                             "${notes[index].title}",
@@ -316,7 +326,7 @@ class HomeScreen : ComponentActivity() {
                                             "${notes[index].description}"
                                         )
                                         model.addDeletedNote(noteItem)
-                                        model.deleteUser(note)
+                                      //  model.deleteNote(note)
                                     }
                                 ),
                             painter = painterResource(R.drawable.ic_delete),

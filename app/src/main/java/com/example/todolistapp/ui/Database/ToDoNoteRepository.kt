@@ -20,4 +20,10 @@ class ToDoNoteRepository(private val noteDatabaseDao: ToDoNoteDatabaseDao) {
         noteDatabaseDao.deleteNotes(notes = notes)
     }
 
+    suspend fun updateUser(notes: ToDoNoteItem)
+    {
+        noteDatabaseDao.updateUser(notes)
+    }
+
+
 }
