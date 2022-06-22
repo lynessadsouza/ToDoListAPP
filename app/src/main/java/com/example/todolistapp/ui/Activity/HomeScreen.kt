@@ -155,9 +155,10 @@ class HomeScreen : ComponentActivity() {
                 FloatingActionButton(
                     modifier = Modifier
                         .size(60.dp)
-                        .align(Alignment.Top)
+                        .align(Alignment.Bottom)
                         .padding(15.dp),
                     shape = CircleShape,
+
                     onClick = {
                         val intent = Intent(context, AddTaskScreen::class.java)
                         startActivity(intent)
