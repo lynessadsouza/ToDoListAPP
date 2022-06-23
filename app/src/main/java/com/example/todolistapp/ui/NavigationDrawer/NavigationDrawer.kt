@@ -9,18 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-@Composable
-fun navigationDrawerHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 64.dp),
-    ) {
-        Text(text = "Header", fontSize = 60.sp)
-    }
-}
+import com.example.todolistapp.ui.Models.MenuItem
 
 @Composable
 fun navigationDrawerBody(

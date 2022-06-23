@@ -1,5 +1,4 @@
 package com.example.todolistapp.ui
-
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -12,7 +11,6 @@ fun AppBar(
     onNavigationIconClick: () -> Unit
 ) {
     TopAppBar(
-
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = MaterialTheme.colors.onPrimary,
         title = {

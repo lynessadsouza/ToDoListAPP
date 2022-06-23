@@ -1,12 +1,12 @@
-package com.example.todolistapp
+package com.example.todolistapp.ui.Activity
+
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,19 +24,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.todolistapp.ui.Models.ToDoNoteItem
+import com.example.todolistapp.ui.Database.ToDoViewModel
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
-import com.google.android.material.internal.ContextUtils.getActivity
 
-class AddTaskScreen : ComponentActivity() {
+class AddTaskScreen() : ComponentActivity() {
+    private val notesViewModel by viewModels<ToDoViewModel>()
+
     @OptIn(ExperimentalAnimationApi::class)
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ToDoListAPPTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    AddTask()
+                    AddTask(notesViewModel)
                 }
             }
         }
@@ -47,7 +49,7 @@ class AddTaskScreen : ComponentActivity() {
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
-fun AddTask() {
+fun AddTask(model: ToDoViewModel) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     val priority = listOf("High", "Medium", "Low")
@@ -77,7 +79,6 @@ fun AddTask() {
                     value = title,
                     onValueChange = {
                         title = it
-                        Log.d("title", title)
                     },
                     Modifier.padding(bottom = 10.dp),
                     label = { Text(text = "Title") },
@@ -122,23 +123,24 @@ fun AddTask() {
                     value = description,
                     onValueChange = {
                         description = it
-                        Log.d("description", description)
 
                     },
                     Modifier.padding(top = 10.dp),
                     label = { Text(text = "Description") },
                 )
                 Button(onClick = {
-                    if (title == "" || description == ""){
-                        Toast.makeText(context, "Please fill out all the details ", Toast.LENGTH_LONG).show()
-                    }
-                    else
-                    {
-                        val intent = Intent()
-                        val note = Notes(title, selectedPriority, description)
-                        intent.putExtra("noteItem", note)
-                        getActivity(context)?.setResult(Activity.RESULT_OK, intent);
-                        getActivity(context)?.finish();
+                    if (title == "" || description == "") {
+                        Toast.makeText(
+                            context,
+                            "Please fill out all the details ",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        val notes = ToDoNoteItem(0, title, selectedPriority, description, false)
+                        model.addNote(notes)
+                        Toast.makeText(context, "Note added successfully!", Toast.LENGTH_LONG)
+                            .show()
+                        context.startActivity(Intent(context, HomeScreen::class.java))
                     }
                 }) {
                     Text("Add Task")
