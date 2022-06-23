@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.todolistapp.ui.Models.ToDoNoteItem
 
 
-@Database(entities = [ToDoNoteItem::class, ToDoNoteItemDeletedNote::class],
-    version = 1, exportSchema = false )
+@Database(entities = [ToDoNoteItem::class],
+    version = 2, exportSchema = false )
 
 abstract class ToDoDatabase: RoomDatabase()
 {
@@ -27,8 +28,9 @@ abstract class ToDoDatabase: RoomDatabase()
                 val instance= Room.databaseBuilder(
                     context.applicationContext,
                     ToDoDatabase::class.java,
-                    "note_db"
-                ).build()
+                    "note"
+                ) .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE=instance
                 return instance
             }

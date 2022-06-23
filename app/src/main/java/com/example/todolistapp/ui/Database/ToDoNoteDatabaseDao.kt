@@ -2,17 +2,12 @@ package com.example.todolistapp.ui.Database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.todolistapp.ui.Models.ToDoNoteItem
 
 @Dao
 interface ToDoNoteDatabaseDao {
 
-    @Query("SELECT * FROM deleted_note_table ")//where firstName= :name ")
-    fun readdeletedAllData(): LiveData<List<ToDoNoteItemDeletedNote>>
-    @Insert
-    suspend fun insertDeletedNotes(notes: ToDoNoteItemDeletedNote)
-
-
-    @Query("SELECT * FROM note_table ")//where firstName= :name ")
+    @Query("SELECT * FROM note_table ")
     fun readAllData(): LiveData<List<ToDoNoteItem>>
 
    @Insert

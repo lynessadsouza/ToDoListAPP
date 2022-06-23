@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.todolistapp.ui.Database.ToDoNoteItem
+import com.example.todolistapp.ui.Models.ToDoNoteItem
 import com.example.todolistapp.ui.Database.ToDoViewModel
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 

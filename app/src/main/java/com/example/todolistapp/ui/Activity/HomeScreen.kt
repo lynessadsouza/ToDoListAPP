@@ -36,8 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.example.todolistapp.NavigationDrawerHeader
 import com.example.todolistapp.R
-import com.example.todolistapp.ui.Database.ToDoNoteItem
-import com.example.todolistapp.ui.Database.ToDoNoteItemDeletedNote
+import com.example.todolistapp.ui.Models.ToDoNoteItem
 import com.example.todolistapp.ui.Database.ToDoViewModel
 import com.example.todolistapp.ui.Models.MenuItem
 import com.example.todolistapp.ui.navigationDrawerBody
@@ -49,13 +48,12 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
     private var filteredNoteList = emptyList<ToDoNoteItem>()
-    private var deletedNotes = emptyList<ToDoNoteItemDeletedNote>()
+    private var dummyList: MutableList<ToDoNoteItem> = ArrayList()
+
+    private var deletedNotes = emptyList<ToDoNoteItem>()
+    var listOfNotes by mutableStateOf(listOf<ToDoNoteItem>())
     private val notesViewModel by viewModels<ToDoViewModel>()
-    private var listOfNotes by mutableStateOf(
-        listOf(
-            ToDoNoteItem(0, "Water", "High", "Drink 2 Glasses", false)
-        )
-    )
+
     var menuItems by mutableStateOf(
         listOf(
             MenuItem("home", "Home", "Go To Home Screen", Icons.Default.Home),
@@ -69,25 +67,34 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             notesViewModel.readAllData.observe(this, Observer { note ->
+                var notDeletedNoteList = emptyList<ToDoNoteItem>()
+                var deletedNoteList = emptyList<ToDoNoteItem>()
 
                 if (note.isEmpty()) {
                     Log.d("tag", "no notes found ")
                     Toast.makeText(this, "Please enter  notes to proceed ", Toast.LENGTH_LONG)
                         .show()
                 }
-
-
-
-                filteredNoteList = note
-                Log.d("filteredNoteList", "$filteredNoteList ")
-
-
-                listOfNotes = note
+                dummyList = note as MutableList<ToDoNoteItem>
+                for(i in dummyList)
+                {
+                    if(i.noteStatus==false)
+                    {
+                        Log.d("noteStatus", "${i.title} ")
+                        notDeletedNoteList=notDeletedNoteList+i
+                        Log.d("noteStatus", "$notDeletedNoteList ")
+                        filteredNoteList = notDeletedNoteList
+                        listOfNotes = notDeletedNoteList
+                    }
+                    else
+                    {
+                        deletedNoteList=deletedNoteList+i
+                        deletedNotes=deletedNoteList
+                        Log.d("noteStatus", "$deletedNotes ")
+                    }
+                }
             })
-            displayNotes(notes = filteredNoteList, model = notesViewModel)
-            notesViewModel.readDeletedData.observe(this, Observer { note ->
-                deletedNotes = note
-            })
+
             ToDoListAPPTheme {
                 val scaffold = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
@@ -317,16 +324,6 @@ class HomeScreen : ComponentActivity() {
                                             true
                                         )
                                         model.updateNote(note)
-
-
-                                        val noteItem = ToDoNoteItemDeletedNote(
-                                            notes[index].id,
-                                            "${notes[index].title}",
-                                            "${notes[index].priority}",
-                                            "${notes[index].description}"
-                                        )
-                                        model.addDeletedNote(noteItem)
-                                      //  model.deleteNote(note)
                                     }
                                 ),
                             painter = painterResource(R.drawable.ic_delete),
@@ -348,7 +345,7 @@ class HomeScreen : ComponentActivity() {
     @ExperimentalAnimationApi
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun displayDeletedNotes(notes: List<ToDoNoteItemDeletedNote>) {
+    fun displayDeletedNotes(notes: List<ToDoNoteItem>) {
         val listState = rememberScrollState()
         val scale = remember { androidx.compose.animation.core.Animatable(0f) }
         LaunchedEffect(key1 = true) {
@@ -436,7 +433,7 @@ class HomeScreen : ComponentActivity() {
     }
 
     @Composable
-    fun listDeletedNotes(deletedNotes: List<ToDoNoteItemDeletedNote>) {
+    fun listDeletedNotes(deletedNotes: List<ToDoNoteItem>) {
         displayDeletedNotes(deletedNotes)
     }
 }
