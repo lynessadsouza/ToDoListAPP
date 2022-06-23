@@ -31,7 +31,5 @@ class ToDoViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateUser(notes = noteItem)
         }
-
     }
-
 }

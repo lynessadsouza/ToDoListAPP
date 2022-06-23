@@ -13,7 +13,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -36,9 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.example.todolistapp.NavigationDrawerHeader
 import com.example.todolistapp.R
-import com.example.todolistapp.ui.Models.ToDoNoteItem
 import com.example.todolistapp.ui.Database.ToDoViewModel
 import com.example.todolistapp.ui.Models.MenuItem
+import com.example.todolistapp.ui.Models.ToDoNoteItem
 import com.example.todolistapp.ui.navigationDrawerBody
 import com.example.todolistapp.ui.theme.ToDoListAPPTheme
 import kotlinx.coroutines.delay
@@ -47,13 +46,12 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 class HomeScreen : ComponentActivity() {
-    private var filteredNoteList = emptyList<ToDoNoteItem>()
-    private var dummyList: MutableList<ToDoNoteItem> = ArrayList()
-
-    private var deletedNotes = emptyList<ToDoNoteItem>()
-    var listOfNotes by mutableStateOf(listOf<ToDoNoteItem>())
     private val notesViewModel by viewModels<ToDoViewModel>()
 
+    private var filteredNoteList = emptyList<ToDoNoteItem>()
+    private var deletedNotes = emptyList<ToDoNoteItem>()
+    var listOfNotes by mutableStateOf(listOf<ToDoNoteItem>())
+    private var databaseListNotes: MutableList<ToDoNoteItem> = ArrayList()
     var menuItems by mutableStateOf(
         listOf(
             MenuItem("home", "Home", "Go To Home Screen", Icons.Default.Home),
@@ -75,22 +73,15 @@ class HomeScreen : ComponentActivity() {
                     Toast.makeText(this, "Please enter  notes to proceed ", Toast.LENGTH_LONG)
                         .show()
                 }
-                dummyList = note as MutableList<ToDoNoteItem>
-                for(i in dummyList)
-                {
-                    if(i.noteStatus==false)
-                    {
-                        Log.d("noteStatus", "${i.title} ")
-                        notDeletedNoteList=notDeletedNoteList+i
-                        Log.d("noteStatus", "$notDeletedNoteList ")
+                databaseListNotes = note as MutableList<ToDoNoteItem>
+                for (noteItem in databaseListNotes) {
+                    if (noteItem.noteStatus == false) {
+                        notDeletedNoteList = notDeletedNoteList + noteItem
                         filteredNoteList = notDeletedNoteList
                         listOfNotes = notDeletedNoteList
-                    }
-                    else
-                    {
-                        deletedNoteList=deletedNoteList+i
-                        deletedNotes=deletedNoteList
-                        Log.d("noteStatus", "$deletedNotes ")
+                    } else {
+                        deletedNoteList = deletedNoteList + noteItem
+                        deletedNotes = deletedNoteList
                     }
                 }
             })
@@ -98,7 +89,9 @@ class HomeScreen : ComponentActivity() {
             ToDoListAPPTheme {
                 val scaffold = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
-                var textstate by remember { mutableStateOf("home") }
+
+                var defaultNavBarState by remember { mutableStateOf("home") }
+                val context = LocalContext.current
                 Scaffold(
                     scaffoldState = scaffold,
                     topBar = {
@@ -117,13 +110,13 @@ class HomeScreen : ComponentActivity() {
                             onItemClick = {
                                 when (it.id) {
                                     "home" -> {
-                                        textstate = "home"
+                                        defaultNavBarState = "home"
                                         scope.launch {
                                             scaffold.drawerState.close()
                                         }
                                     }
                                     "deletedNotes" -> {
-                                        textstate = "deletedNotes"
+                                        defaultNavBarState = "deletedNotes"
                                         scope.launch {
                                             scaffold.drawerState.close()
                                         }
@@ -131,21 +124,33 @@ class HomeScreen : ComponentActivity() {
                                 }
                             }
                         )
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = {
+                                context.startActivity(Intent(context, AddTaskScreen::class.java))
+
+                            },
+                            backgroundColor = MaterialTheme.colors.primary,
+                            content = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_baseline_add_24),
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        )
+
                     }
                 ) {
-                    if (textstate == "home") {
+                    if (defaultNavBarState == "home") {
                         ListPreviousNotes()
-                    } else if (textstate == "deletedNotes") {
+                    } else if (defaultNavBarState == "deletedNotes") {
                         listDeletedNotes(deletedNotes)
                     }
                 }
             }
         }
-    }
-
-    @Composable
-    fun noNotesFound() {
-        Text(text = "No Notes Found")
     }
 
     @ExperimentalMaterialApi
@@ -166,23 +171,6 @@ class HomeScreen : ComponentActivity() {
             ) {
                 val context = LocalContext.current
                 val list = searchNote(listNotes = listOfNotes)
-                FloatingActionButton(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .align(Alignment.Bottom)
-                        .padding(15.dp),
-                    shape = CircleShape,
-
-                    onClick = {
-                        val intent = Intent(context, AddTaskScreen::class.java)
-                        startActivity(intent)
-                    },
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_add_24),
-                        contentDescription = null
-                    )
-                }
                 if (list.isNotEmpty()) {
                     filteredNoteList = list
                 } else if (list.isEmpty()) {
@@ -221,6 +209,7 @@ class HomeScreen : ComponentActivity() {
         }
         return filteredList
     }
+
 
     @ExperimentalMaterialApi
     @ExperimentalAnimationApi
@@ -376,6 +365,9 @@ class HomeScreen : ComponentActivity() {
                                 end = 20.dp
                             )
                             .shadow(1.dp)
+                            .clickable {
+
+                            }
                             .fillMaxWidth()
                             .background(Color.White),
                         shape = RoundedCornerShape(8.dp),
@@ -385,7 +377,11 @@ class HomeScreen : ComponentActivity() {
                             modifier = Modifier
                                 .padding(top = 1.dp, bottom = 1.dp, end = 10.dp)
                                 .background(Color.White)
+                                /*.clickable {
+
+                                }*/
                                 .horizontalScroll(listState),
+
                             verticalAlignment = Alignment.CenterVertically
 
                         ) {

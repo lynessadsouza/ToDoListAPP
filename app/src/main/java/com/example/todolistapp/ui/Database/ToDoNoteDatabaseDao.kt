@@ -9,16 +9,10 @@ interface ToDoNoteDatabaseDao {
 
     @Query("SELECT * FROM note_table ")
     fun readAllData(): LiveData<List<ToDoNoteItem>>
-
    @Insert
     suspend fun insertNotes(notes: ToDoNoteItem)
-
     @Delete
     suspend fun deleteNotes(notes: ToDoNoteItem)
     @Update
     suspend fun updateUser(notes: ToDoNoteItem)
-
-
-
-
 }
