@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -35,7 +36,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Observer
 import com.example.todolistapp.NavigationDrawerHeader
 import com.example.todolistapp.R
+import com.example.todolistapp.ui.Activity.ui.TaskDetailsScreen
 import com.example.todolistapp.ui.Database.ToDoViewModel
+import com.example.todolistapp.ui.Models.BottomMenuContent
 import com.example.todolistapp.ui.Models.MenuItem
 import com.example.todolistapp.ui.Models.ToDoNoteItem
 import com.example.todolistapp.ui.navigationDrawerBody
@@ -92,6 +95,7 @@ class HomeScreen : ComponentActivity() {
 
                 var defaultNavBarState by remember { mutableStateOf("home") }
                 val context = LocalContext.current
+
                 Scaffold(
                     scaffoldState = scaffold,
                     topBar = {
@@ -247,10 +251,17 @@ class HomeScreen : ComponentActivity() {
                     shape = RoundedCornerShape(8.dp),
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
+                    var context = LocalContext.current
                     Row(
                         modifier = Modifier
                             .padding(top = 1.dp, bottom = 1.dp, end = 10.dp)
                             .background(Color.White)
+                            .clickable {
+                                val intent = Intent(context, TaskDetailsScreen::class.java)
+                                intent.putExtra("note", notes[index])
+                                startActivity(intent)
+                                Log.d("TAG-notes", "${notes[index]}")
+                            }
                             .horizontalScroll(listState),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -295,10 +306,8 @@ class HomeScreen : ComponentActivity() {
                                     } else {
                                         Color.Black
                                     }
-
                                 )
                             }
-
                         }
                         Image(
                             modifier = Modifier
@@ -365,9 +374,6 @@ class HomeScreen : ComponentActivity() {
                                 end = 20.dp
                             )
                             .shadow(1.dp)
-                            .clickable {
-
-                            }
                             .fillMaxWidth()
                             .background(Color.White),
                         shape = RoundedCornerShape(8.dp),
@@ -376,10 +382,7 @@ class HomeScreen : ComponentActivity() {
                         Row(
                             modifier = Modifier
                                 .padding(top = 1.dp, bottom = 1.dp, end = 10.dp)
-                                .background(Color.White)
-                                /*.clickable {
-
-                                }*/
+                                .background(Color.Red)
                                 .horizontalScroll(listState),
 
                             verticalAlignment = Alignment.CenterVertically
@@ -403,7 +406,6 @@ class HomeScreen : ComponentActivity() {
                                 Modifier
                                     .width(250.dp)
                                     .padding(start = 10.dp)
-
                             ) {
                                 notes[index].title?.let {
                                     Text(
@@ -431,6 +433,56 @@ class HomeScreen : ComponentActivity() {
     @Composable
     fun listDeletedNotes(deletedNotes: List<ToDoNoteItem>) {
         displayDeletedNotes(deletedNotes)
+    }
+
+    @Composable
+    fun BottomMenu(
+        items:List<BottomMenuContent>,
+        modifier : Modifier= Modifier,
+        activeHighlightColor:Color= MaterialTheme.colors.onPrimary,
+        activeTextColor: Color= Color.White,
+         inactiveTextColor: Color= Color.Cyan,
+        initialSelectedItemIndex:Int=0
+
+    ){
+        var selectedItemIndex by remember { mutableStateOf(initialSelectedItemIndex)}
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primary)
+                .padding(16.dp)
+        ){
+            items.forEachIndexed { index,item->
+
+            }
+        }
+    }
+
+    @Composable
+    fun BottomMenuItem(
+        items: BottomMenuContent,
+        isSelected:Boolean=false,
+        activeHighlightColor:Color= MaterialTheme.colors.onPrimary,
+        activeTextColor: Color= Color.White,
+        inactiveTextColor: Color= Color.Cyan,
+        onItemClick:()->Unit
+        ){
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier=Modifier.clickable {
+                    onItemClick
+                }
+            ){
+                Box( contentAlignment = Alignment.Center,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                    .background()
+                    ){
+
+                }
+            }
     }
 }
 
